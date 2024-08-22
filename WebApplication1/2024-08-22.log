@@ -1,0 +1,208 @@
+[Trace] 2024-08-22 13:39:49, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0122667的交易紀錄
+[Debug] 2024-08-22 13:39:49, StockController.cs-GetUnrealizedGainOrLoss-82, 參數, HCNTD有3筆、HCNRH有7筆
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：69599, profit：69599, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：88325, profit：88325, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：69498, profit：69498, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：55779.00, profit：55779.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：29542.00, profit：29542.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：29542.00, profit：29542.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：29091.00, profit：29091.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：63390.00, profit：63390.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：16623.00, profit：16623.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailList-46, 變數, cost：98239.00, profit：98239.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：69599, profit：69599, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：88325, profit：88325, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：69498, profit：69498, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：55779.00, profit：55779.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：29542.00, profit：29542.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：29542.00, profit：29542.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：29091.00, profit：29091.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：63390.00, profit：63390.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：16623.00, profit：16623.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitDetailOutList-99, 變數, cost：98239.00, profit：98239.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：69599, profit：69599, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：88325, profit：88325, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：69498, profit：69498, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：55779.00, profit：55779.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：29542.00, profit：29542.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：29542.00, profit：29542.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：29091.00, profit：29091.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：63390.00, profit：63390.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：16623.00, profit：16623.00, pl_ratio：100
+[Debug] 2024-08-22 13:39:49, ProfitService.cs-GetProfitSum-190, 變數, cost：98239.00, profit：98239.00, pl_ratio：100
+[Trace] 2024-08-22 15:45:46, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0122667的交易紀錄
+[Debug] 2024-08-22 15:45:46, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0122667, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:45:46, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0122667, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:45:47, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有3筆、HCNRH有7筆
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： j0431, dno： t0489
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 2408, tdate： 20210104, dseq： t0082, dno： t0446
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： t0426, dno： t0489
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200325, dseq： i0343, dno： 0000002
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： t0345, dno： 0000001
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： t0345, dno： 0000001
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200901, dseq： j0334, dno： 0000003
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 5243, tdate： 20201231, dseq： i0509, dno： 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 6129, tdate： 20201231, dseq： j0400, dno： 0000010
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2351, tdate： 20201231, dseq： j0541, dno： 0000013
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： 0000007, dno： 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 2408, tdate： 20210104, dseq： 0000001, dno： 0000011
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： 0000006, dno： 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200325, dseq： j0436, dno： 0000009
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： i0527, dno： 0000015
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： j0437, dno： 0000010
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200901, dseq： i0527, dno： 0000015
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 5243, tdate： 20201231, dseq： t0489, dno： 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 6129, tdate： 20201231, dseq： i0228, dno： 0000003
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2351, tdate： 20201231, dseq： i0255, dno： 0000004
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000007, 分單號: 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000001, 分單號: 0000011
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000006, 分單號: 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200325, 委託書號: j0436, 分單號: 0000009
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200825, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200825, 委託書號: j0437, 分單號: 0000010
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200901, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: t0489, 分單號: 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: i0228, 分單號: 0000003
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: i0255, 分單號: 0000004
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000007, 分單號: 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000001, 分單號: 0000011
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000006, 分單號: 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200325, 委託書號: j0436, 分單號: 0000009
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200825, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200825, 委託書號: j0437, 分單號: 0000010
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200901, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: t0489, 分單號: 0000012
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: i0228, 分單號: 0000003
+[Debug] 2024-08-22 15:45:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: i0255, 分單號: 0000004
+[Trace] 2024-08-22 15:54:47, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0122667的交易紀錄
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0122667, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0122667, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:54:47, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有3筆、HCNRH有7筆
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： j0431, dno： t0489
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 2408, tdate： 20210104, dseq： t0082, dno： t0446
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： t0426, dno： t0489
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200325, dseq： i0343, dno： 0000002
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： t0345, dno： 0000001
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： t0345, dno： 0000001
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200901, dseq： j0334, dno： 0000003
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 5243, tdate： 20201231, dseq： i0509, dno： 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 6129, tdate： 20201231, dseq： j0400, dno： 0000010
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2351, tdate： 20201231, dseq： j0541, dno： 0000013
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： 0000007, dno： 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 2408, tdate： 20210104, dseq： 0000001, dno： 0000011
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： 0000006, dno： 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200325, dseq： j0436, dno： 0000009
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： i0527, dno： 0000015
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： j0437, dno： 0000010
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200901, dseq： i0527, dno： 0000015
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 5243, tdate： 20201231, dseq： t0489, dno： 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 6129, tdate： 20201231, dseq： i0228, dno： 0000003
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2351, tdate： 20201231, dseq： i0255, dno： 0000004
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000007, 分單號: 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000001, 分單號: 0000011
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000006, 分單號: 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200325, 委託書號: j0436, 分單號: 0000009
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200825, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200825, 委託書號: j0437, 分單號: 0000010
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200901, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: t0489, 分單號: 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: i0228, 分單號: 0000003
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: i0255, 分單號: 0000004
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000007, 分單號: 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000001, 分單號: 0000011
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000006, 分單號: 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200325, 委託書號: j0436, 分單號: 0000009
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200825, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200825, 委託書號: j0437, 分單號: 0000010
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200901, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: t0489, 分單號: 0000012
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: i0228, 分單號: 0000003
+[Debug] 2024-08-22 15:54:47, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: i0255, 分單號: 0000004
+[Trace] 2024-08-22 15:55:32, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0000527的交易紀錄
+[Debug] 2024-08-22 15:55:32, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0000527, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:55:32, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0000527, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:55:32, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有0筆、HCNRH有0筆
+[Warn] 2024-08-22 15:55:32, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到592S帳號0000527在20210103到20210104這段期間的交易紀錄
+[Trace] 2024-08-22 15:56:38, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0122667的交易紀錄
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0122667, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0122667, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:56:38, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有3筆、HCNRH有7筆
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： j0431, dno： t0489
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 2408, tdate： 20210104, dseq： t0082, dno： t0446
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： t0426, dno： t0489
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200325, dseq： i0343, dno： 0000002
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： t0345, dno： 0000001
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： t0345, dno： 0000001
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2886, tdate： 20200901, dseq： j0334, dno： 0000003
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 5243, tdate： 20201231, dseq： i0509, dno： 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 6129, tdate： 20201231, dseq： j0400, dno： 0000010
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 2351, tdate： 20201231, dseq： j0541, dno： 0000013
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： 0000007, dno： 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 2408, tdate： 20210104, dseq： 0000001, dno： 0000011
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 5243, tdate： 20210104, dseq： 0000006, dno： 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200325, dseq： j0436, dno： 0000009
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： i0527, dno： 0000015
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200825, dseq： j0437, dno： 0000010
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2886, tdate： 20200901, dseq： i0527, dno： 0000015
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 5243, tdate： 20201231, dseq： t0489, dno： 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 6129, tdate： 20201231, dseq： i0228, dno： 0000003
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 2351, tdate： 20201231, dseq： i0255, dno： 0000004
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000007, 分單號: 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000001, 分單號: 0000011
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210104, 委託書號: 0000006, 分單號: 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200325, 委託書號: j0436, 分單號: 0000009
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200825, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200825, 委託書號: j0437, 分單號: 0000010
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20200901, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: t0489, 分單號: 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: i0228, 分單號: 0000003
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201231, 委託書號: i0255, 分單號: 0000004
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000007, 分單號: 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000001, 分單號: 0000011
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210104, 委託書號: 0000006, 分單號: 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200325, 委託書號: j0436, 分單號: 0000009
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200825, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200825, 委託書號: j0437, 分單號: 0000010
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20200901, 委託書號: i0527, 分單號: 0000015
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: t0489, 分單號: 0000012
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: i0228, 分單號: 0000003
+[Debug] 2024-08-22 15:56:38, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201231, 委託書號: i0255, 分單號: 0000004
+[Trace] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0000527的交易紀錄
+[Debug] 2024-08-22 15:56:48, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0000527, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:56:48, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0000527, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有0筆、HCNRH有0筆
+[Warn] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到分公司592S帳號0000527在20210103到20210104這段期間的交易紀錄
+[Trace] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0000527的交易紀錄
+[Debug] 2024-08-22 15:56:48, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0000527, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:56:48, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0000527, sdate20210103, edate20210104
+[Debug] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有0筆、HCNRH有0筆
+[Warn] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到分公司592S帳號0000527在20210103到20210104這段期間的交易紀錄
+[Trace] 2024-08-22 16:06:04, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0092661的交易紀錄
+[Debug] 2024-08-22 16:06:04, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0092661, sdate20210103, edate20210104
+[Debug] 2024-08-22 16:06:05, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0092661, sdate20210103, edate20210104
+[Debug] 2024-08-22 16:06:05, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有0筆、HCNRH有0筆
+[Warn] 2024-08-22 16:06:05, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到分公司592S帳號0092661在20210103到20210104這段期間的交易紀錄
+[Trace] 2024-08-22 16:08:42, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0092661的交易紀錄
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0092661, sdate20210106, edate20210201
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0092661, sdate20210106, edate20210201
+[Debug] 2024-08-22 16:08:42, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有1筆、HCNRH有1筆
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 1609, tdate： 20210201, dseq： q0033, dno： q0067
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 4728, tdate： 20201028, dseq： 2451A, dno： 02
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 1609, tdate： 20210201, dseq： 0000003, dno： 0000002
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 4728, tdate： 20201028, dseq： q0178, dno： 0000002
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210201, 委託書號: 0000003, 分單號: 0000002
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201028, 委託書號: q0178, 分單號: 0000002
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210201, 委託書號: 0000003, 分單號: 0000002
+[Debug] 2024-08-22 16:08:42, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201028, 委託書號: q0178, 分單號: 0000002
+[Trace] 2024-08-22 16:16:08, StockController.cs-GetUnrealizedGainOrLoss-73, 開始, 開始搜尋592S帳號0092661的交易紀錄
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetHCNTDList-289, 參數, 獲取HCNTD table - bhno592S, cseq0092661, sdate20210106, edate20210201
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetHCNRHList-312, 參數, 獲取HCNRH table - bhno592S, cseq0092661, sdate20210106, edate20210201
+[Debug] 2024-08-22 16:16:08, StockController.cs-GetUnrealizedGainOrLoss-77, 參數, HCNTD有1筆、HCNRH有1筆
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNTD, stock： 1609, tdate： 20210201, dseq： q0033, dno： q0067
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetProfitDetailList-46, 參數, 未實現損益-個股明細資料 (買入) - 資料庫： HCNRH, stock： 4728, tdate： 20201028, dseq： 2451A, dno： 02
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNTD, stock： 1609, tdate： 20210201, dseq： 0000003, dno： 0000002
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetProfitDetailOutList-114, 參數, 已實現損益 - 個股明細資料 (賣出) - 資料庫： HCNRH, stock： 4728, tdate： 20201028, dseq： q0178, dno： 0000002
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20210201, 委託書號: 0000003, 分單號: 0000002
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-SumProfitDetailOut-178, 參數, 加總已實現損益 - 個股明細資料 (賣出) - 處理日期: 20201028, 委託書號: q0178, 分單號: 0000002
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20210201, 委託書號: 0000003, 分單號: 0000002
+[Debug] 2024-08-22 16:16:08, ProfitService.cs-GetProfitSum-234, 參數, 已實現損益-個股彙總資料 - 處理日期: 20201028, 委託書號: q0178, 分單號: 0000002

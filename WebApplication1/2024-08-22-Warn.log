@@ -1,0 +1,4 @@
+[Warn] 2024-08-22 15:55:32, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到592S帳號0000527在20210103到20210104這段期間的交易紀錄
+[Warn] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到分公司592S帳號0000527在20210103到20210104這段期間的交易紀錄
+[Warn] 2024-08-22 15:56:48, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到分公司592S帳號0000527在20210103到20210104這段期間的交易紀錄
+[Warn] 2024-08-22 16:06:05, StockController.cs-GetUnrealizedGainOrLoss-133, 錯誤, 未找到分公司592S帳號0092661在20210103到20210104這段期間的交易紀錄

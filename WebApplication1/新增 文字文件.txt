@@ -1,0 +1,25 @@
+多筆
+{
+  "qtype": "0002",
+  "bhno": "592S",
+  "cseq": "0122667",
+  "sdate": "20210103",
+  "edate": "20210104"
+}
+HCNTD跟HCNRH各一筆
+{
+  "qtype": "0002",
+  "bhno": "592S",
+  "cseq": "0092661",
+  "sdate": "20210106",
+  "edate": "20210201"
+}
+
+
+{
+  "qtype": "0001",
+  "bhno": "592S",
+  "cseq": "0000527",
+  "sdate": "string",
+  "edate": "string"
+}
