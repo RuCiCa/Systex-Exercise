@@ -72,8 +72,8 @@ namespace WebApplication1.Controllers
                     try
                     {
                         Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
-                        List<ExtendedHCNTD> HCNTDList = await _profitService.GetHCNTDList(bhno, cseq, request.sdate, request.Edate);
-                        List<ExtendedHCNRH> HCNRHList = await _profitService.GetHCNRHList(bhno, cseq, request.sdate, request.Edate);
+                        List<ExtendedHCNTD> HCNTDList = await _profitService.GetHCNTDList(bhno, cseq, request.sdate, request.Edate, stockSymbol);
+                        List<ExtendedHCNRH> HCNRHList = await _profitService.GetHCNRHList(bhno, cseq, request.sdate, request.Edate, stockSymbol);
 
                         Logger.Log(1, "參數", $"HCNTD有{HCNTDList.Count()}筆、HCNRH有{HCNRHList.Count()}筆");
                         List<ProfitDetailOut> profitDetailOuts = new List<ProfitDetailOut>();
