@@ -7,7 +7,7 @@ namespace WebApplication1.Service.Api
     public interface IUnOffsetService
     {
         UnOffsetDetail GetUnOffsetDetail(UnOffset unOffset);
-        Task<List<UnOffsetDetail>> GetUnOffsetDetailList(string bhno, string cseq);
+        Task<List<UnOffsetDetail>> GetUnOffsetDetailList(string bhno, string cseq, string stockSymbol);
         UnOffsetSum GetUnOffsetSum(List<UnOffsetDetail> list);
         Task<List<UnOffsetSum>> GetUnOffsetSumList(List<UnOffsetDetail> list);
         Task<UnOffsetAccsum> GetUnOffsetAccsum(List<UnOffsetSum> list);

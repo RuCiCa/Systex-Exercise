@@ -36,6 +36,7 @@ namespace WebApplication1.Controllers
             string bhno = request.BHNO;
             string cseq = request.CSEQ;
             string qtype = request.qtype;
+            string stockSymbol = request.stockSymbol;
             switch (qtype)
             {
                 case ("0001"):
@@ -43,7 +44,7 @@ namespace WebApplication1.Controllers
                     {
                         //資料庫內尋找所有的交易紀錄，如果沒找到任何紀錄就會回傳404 Not Found
                         Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
-                        var UnOffsetDetailList = await _unOffsetService.GetUnOffsetDetailList(bhno, cseq);
+                        var UnOffsetDetailList = await _unOffsetService.GetUnOffsetDetailList(bhno, cseq, stockSymbol);
                         if (UnOffsetDetailList == null)
                         {
                             return Ok(_unOffsetService.GetFailedUnOffsetAccsum("404", "未實現損益 – 個股明細獲取失敗"));

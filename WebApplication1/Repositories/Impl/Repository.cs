@@ -28,13 +28,15 @@ namespace WebApplication1.Repositories.Impl
         /// </summary>
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
+        /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳UnOffset，裡面包含TCNUD跟CNAME還有CPRICE</returns>
-        public async Task<IEnumerable<UnOffset>> GetByTwoKey(string bhno, string cseq)
+        public async Task<IEnumerable<UnOffset>> GetByTwoKey(string bhno, string cseq, string stockSymbol)
         {
             var query = from tcnud in InMemoryCache.TCNUDData
                         join mstmb in InMemoryCache.MSTMBData on tcnud.STOCK equals mstmb.STOCK
                         where tcnud.BHNO == bhno &&
-                              tcnud.CSEQ == cseq
+                              tcnud.CSEQ == cseq &&
+                              tcnud.STOCK == stockSymbol
                         select new UnOffset
                         {
                             TCNUD = tcnud,
