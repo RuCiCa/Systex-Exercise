@@ -37,12 +37,17 @@ namespace WebApplication1.Service.Impl
                 decimal? mamt = bqty * mprice;
                 decimal? lastprice = unOffset.CPRICE;
                 decimal? cost = tcnud.COST;
-                decimal? estimateAmt = lastprice * tcnud.BQTY;
+                decimal? estimateAmt = Math.Floor((lastprice * tcnud.BQTY) ?? 0m);
                 decimal estFee = 0.001425m;
                 decimal estTax = 0.003m;
                 Logger.Log(2, "變數", $"手續費為：{estFee}, 稅率為：{estTax}");
-                decimal? estimateFee = estimateAmt * estFee;
-                decimal? estimateTax = estimateAmt * estTax;
+                decimal? estimateFee = Math.Floor((estimateAmt * estFee) ?? 0m);
+                if (estimateFee < 20m)
+                {
+                    estimateFee = 20m;
+                }
+
+                decimal? estimateTax = Math.Floor((estimateAmt * estTax) ?? 0m);
                 decimal? marketvalue = estimateAmt - estimateFee - estimateTax;
                 decimal? profit = marketvalue - cost;
                 string pl_ratio;
@@ -99,11 +104,11 @@ namespace WebApplication1.Service.Impl
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
         /// <returns>成功會回傳unOffsetDetailList，用來保存unOffsetDetail</returns>
-        public async Task<List<UnOffsetDetail>> GetUnOffsetDetailList(string bhno, string cseq)
+        public async Task<List<UnOffsetDetail>> GetUnOffsetDetailList(string bhno, string cseq, string stockSymbol)
         {
             //建立一個dict，然後使用StringArrayComparer來對作為key的string[]檢查
             var unOffsetDetailList = new List<UnOffsetDetail>();
-            var list = (await _repository.GetByTwoKey(bhno, cseq)).ToList();
+            var list = (await _repository.GetByTwoKey(bhno, cseq, stockSymbol)).ToList();
             if (list.Count == 0)
             {
                 Logger.Log(3, "警告", $"資料庫內找不到分公司{bhno}帳號{cseq}的交易紀錄");
@@ -143,6 +148,7 @@ namespace WebApplication1.Service.Impl
         /// <returns>成功會回傳單一股票的unOffsetSum，用來保存個股未實現損益</returns>
         public UnOffsetSum GetUnOffsetSum(List<UnOffsetDetail> list)
         {
+
             try
             {
                 string stock = list.FirstOrDefault()?.stock;
@@ -151,9 +157,13 @@ namespace WebApplication1.Service.Impl
                 decimal? cost = list.Sum(t => t.cost);
                 decimal? avgprice = cost / bqty;
                 decimal? marketvalue = list.Sum(t => t.marketvalue);
-                decimal? estimateAmt = list.Sum(t => t.estimateAmt);
-                decimal? estimateFee = list.Sum(t => t.estimateFee);
-                decimal? estimateTax = list.Sum(t => t.estimateTax);
+                decimal? estimateAmt = Math.Floor((list.Sum(t => t.estimateAmt)) ?? 0m);
+                decimal? estimateFee = Math.Floor((list.Sum(t => t.estimateFee)) ?? 0m);
+                if (estimateFee < 20m)
+                {
+                    estimateFee = 20m;
+                }
+                decimal? estimateTax = Math.Floor((list.Sum(t => t.estimateTax)) ?? 0m);
                 decimal? profit = list.Sum(t => t.profit);
                 decimal? fee = list.Sum(t => t.fee);
                 decimal? tax = list.Sum(t => t.tax);
@@ -273,9 +283,13 @@ namespace WebApplication1.Service.Impl
 
                 var fee = list.Sum(t => t.fee);
                 var tax = list.Sum(t => t.tax);
-                var estimateAmt = list.Sum(t => t.estimateAmt);
-                var estimateFee = list.Sum(t => t.estimateFee);
-                var estimateTax = list.Sum(t => t.estimateTax);
+                decimal? estimateAmt = Math.Floor((list.Sum(t => t.estimateAmt)) ?? 0m);
+                decimal? estimateFee = Math.Floor((list.Sum(t => t.estimateFee)) ?? 0m);
+                if (estimateFee < 20m)
+                {
+                    estimateFee = 20m;
+                }
+                decimal? estimateTax = Math.Floor((list.Sum(t => t.estimateTax)) ?? 0m);
 
                 //如果都沒問題就將errcode設為0000，errmsg設為成功
                 var errcode = "0000";
