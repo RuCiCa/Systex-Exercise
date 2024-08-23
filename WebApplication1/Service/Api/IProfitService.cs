@@ -13,7 +13,7 @@ namespace WebApplication1.Service.Api
         Task<List<ProfitSum>> GetProfitSumList(string bhno, string cseq, List<ProfitDetailOut> profitDetailOuts, List<ProfitDetail> profitDetails);
         Task<ProfitAccsum> GetProfittAccsum(List<ProfitSum> list);
         Task<ProfitAccsum> GetProfittAccsumFailed(string errorcode, string errormsg);
-        Task<List<ExtendedHCNTD>> GetHCNTDList(string bhno, string cseq, string sdate, string edate);
-        Task<List<ExtendedHCNRH>> GetHCNRHList(string bhno, string cseq, string sdate, string edate);
+        Task<List<ExtendedHCNTD>> GetHCNTDList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
+        Task<List<ExtendedHCNRH>> GetHCNRHList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
     }
 }

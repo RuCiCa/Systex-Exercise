@@ -10,8 +10,8 @@ namespace WebApplication1.Repositories.Api
     public interface IRepository
     {
         Task<IEnumerable<UnOffset>> GetByTwoKey(string cseq, string bhno, string stockSymbol);
-        Task<IEnumerable<ExtendedHCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate);
-        Task<IEnumerable<ExtendedHCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate);
+        Task<IEnumerable<ExtendedHCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol);
+        Task<IEnumerable<ExtendedHCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate, string stockSymbol);
 
     }
 }

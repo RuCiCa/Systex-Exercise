@@ -54,15 +54,17 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="cseq">帳號</param>
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的歷史現股沖銷以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<ExtendedHCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate)
+        public async Task<IEnumerable<ExtendedHCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from hcnrh in InMemoryCache.HCNRHData
                         join mstmb in InMemoryCache.MSTMBData on hcnrh.STOCK equals mstmb.STOCK
                         where hcnrh.CSEQ == cseq &&
                               hcnrh.BHNO == bhno &&
                               string.Compare(hcnrh.TDATE, sdate) >= 0 &&
-                              string.Compare(hcnrh.TDATE, edate) <= 0
+                              string.Compare(hcnrh.TDATE, edate) <= 0 &&
+                              (string.IsNullOrEmpty(stockSymbol) || hcnrh.STOCK == stockSymbol)
                         select new ExtendedHCNRH
                         {
                             STOCK = hcnrh.STOCK ?? string.Empty,
@@ -107,15 +109,17 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="cseq">帳號</param>
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的歷史現股當沖以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<ExtendedHCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate)
+        public async Task<IEnumerable<ExtendedHCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from hcntd in InMemoryCache.HCNTDData
                         join mstmb in InMemoryCache.MSTMBData on hcntd.STOCK equals mstmb.STOCK
                         where hcntd.CSEQ == cseq &&
                               hcntd.BHNO == bhno &&
                               string.Compare(hcntd.TDATE, sdate) >= 0 &&
-                              string.Compare(hcntd.TDATE, edate) <= 0
+                              string.Compare(hcntd.TDATE, edate) <= 0 &&
+                              (string.IsNullOrEmpty(stockSymbol) || hcntd.STOCK == stockSymbol)
                         select new ExtendedHCNTD
                         {
                             STOCK = hcntd.STOCK ?? string.Empty,

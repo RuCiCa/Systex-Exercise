@@ -283,13 +283,14 @@ namespace WebApplication1.Service.Impl
         /// <param name="cseq">帳號</param>
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代號</param>
         /// <returns>回傳HCNTD加上CNAME組成的ExtendedHCNTD</returns>
-        public async Task<List<ExtendedHCNTD>> GetHCNTDList(string bhno, string cseq, string sdate, string edate)
+        public async Task<List<ExtendedHCNTD>> GetHCNTDList(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             Logger.Log(1, "參數", $"獲取HCNTD table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
             try
             {
-                return (await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate)).ToList();
+                return (await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate, stockSymbol)).ToList();
             }
             catch(Exception ex)
             {
@@ -306,13 +307,14 @@ namespace WebApplication1.Service.Impl
         /// <param name="cseq">帳號</param>
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代號</param>
         /// <returns>回傳HCNrh加上CNAME組成的ExtendedHCNrh</returns>
-        public async Task<List<ExtendedHCNRH>> GetHCNRHList(string bhno, string cseq, string sdate, string edate)
+        public async Task<List<ExtendedHCNRH>> GetHCNRHList(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             Logger.Log(1, "參數", $"獲取HCNRH table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
             try
             {
-                return (await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate)).ToList();
+                return (await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate, stockSymbol)).ToList();
             }
             catch (Exception ex)
             {
