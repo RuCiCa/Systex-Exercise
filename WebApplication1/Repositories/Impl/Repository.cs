@@ -36,7 +36,7 @@ namespace WebApplication1.Repositories.Impl
                         join mstmb in InMemoryCache.MSTMBData on tcnud.STOCK equals mstmb.STOCK
                         where tcnud.BHNO == bhno &&
                               tcnud.CSEQ == cseq &&
-                              tcnud.STOCK == stockSymbol
+                              (string.IsNullOrEmpty(stockSymbol) || tcnud.STOCK == stockSymbol)
                         select new UnOffset
                         {
                             TCNUD = tcnud,
