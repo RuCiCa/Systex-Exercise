@@ -9,6 +9,8 @@ namespace WebApplication1.Common
         public static List<HCNTD> HCNTDData { get; set; }
         public static List<TCNUD> TCNUDData { get; set; }
         public static List<MSTMB> MSTMBData { get; set; }
+        public static List<HCMIO> HCMIOData { get; set; }
+        public static List<TMHIO> TMHIOData { get; set; }
 
         static InMemoryCache()
         {
@@ -16,6 +18,8 @@ namespace WebApplication1.Common
             HCNTDData = new List<HCNTD>();
             TCNUDData = new List<TCNUD>();
             MSTMBData = new List<MSTMB>();
+            HCMIOData = new List<HCMIO>();
+            TMHIOData = new List<TMHIO>();
         }
     }
 }

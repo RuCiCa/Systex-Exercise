@@ -2,26 +2,26 @@
 {
     public class TMHIO
     {
-        public string TDATE { get; set; }  // Unchecked
-        public string BHNO { get; set; }  // Unchecked
-        public string DSEQ { get; set; }  // Unchecked
-        public string JRNUM { get; set; }  // Unchecked
-        public string MTYPE { get; set; }  // Unchecked
-        public string CSEQ { get; set; }  // Unchecked
-        public string TTYPE { get; set; }  // Unchecked
-        public string STYPE { get; set; }  // Unchecked
-        public string BSTYPE { get; set; }  // Unchecked
-        public string STOCK { get; set; }  // Unchecked
-        public decimal? QTY { get; set; }  // Checked
-        public decimal PRICE { get; set; }  // Unchecked
-        public string? SALES { get; set; }  // Checked
-        public string? ORIGN { get; set; }  // Checked
-        public string? MTIME { get; set; }  // Checked
-        public string? TRDATE { get; set; }  // Checked
-        public string? TRTIME { get; set; }  // Checked
-        public string? MODDATE { get; set; }  // Checked
-        public string? MODTIME { get; set; }  // Checked
-        public string? MODUSER { get; set; }  // Checked
+        public string TDATE { get; set; }  
+        public string BHNO { get; set; }  
+        public string DSEQ { get; set; }  
+        public string JRNUM { get; set; }  
+        public string MTYPE { get; set; }  
+        public string CSEQ { get; set; }  
+        public string TTYPE { get; set; }  
+        public string STYPE { get; set; }  
+        public string BSTYPE { get; set; }  
+        public string STOCK { get; set; }  
+        public decimal? QTY { get; set; }  
+        public decimal PRICE { get; set; }  
+        public string? SALES { get; set; }  
+        public string? ORIGN { get; set; }  
+        public string? MTIME { get; set; }  
+        public string? TRDATE { get; set; }  
+        public string? TRTIME { get; set; }  
+        public string? MODDATE { get; set; }  
+        public string? MODTIME { get; set; }  
+        public string? MODUSER { get; set; }  
     }
 
 }

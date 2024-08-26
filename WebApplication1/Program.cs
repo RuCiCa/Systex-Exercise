@@ -50,6 +50,8 @@ using (var scope = app.Services.CreateScope())
     InMemoryCache.HCNTDData = context.HCNTDTable.ToList();
     InMemoryCache.TCNUDData = context.TCNUDTable.ToList();
     InMemoryCache.MSTMBData = context.MSTMBTable.ToList();
+    InMemoryCache.HCMIOData = context.HCMIOTable.ToList();
+    InMemoryCache.TMHIOData = context.TMHIOTable.ToList();
 }
 
 if (app.Environment.IsDevelopment())
