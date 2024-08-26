@@ -1,4 +1,6 @@
-﻿namespace WebApplication1.Common
+﻿using System.Text.Json.Serialization;
+
+namespace WebApplication1.Common
 {
     public class HCMIO
     {
@@ -43,5 +45,10 @@
         public string? MODDATE { get; set; }  
         public string? MODTIME { get; set; }  
         public string? MODUSER { get; set; }  
+    }
+    public class ExtendedHCMIO : HCMIO
+    {
+        [JsonIgnore]
+        public string? CNAME { get; set; }
     }
 }

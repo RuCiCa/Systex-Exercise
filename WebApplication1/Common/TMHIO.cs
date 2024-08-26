@@ -1,4 +1,7 @@
-﻿namespace WebApplication1.Common
+﻿using System.Text.Json.Serialization;
+using WebApplication1.Common.HCN;
+
+namespace WebApplication1.Common
 {
     public class TMHIO
     {
@@ -23,5 +26,9 @@
         public string? MODTIME { get; set; }  
         public string? MODUSER { get; set; }  
     }
-
+    public class ExtendedTMHIO : TMHIO
+    {
+        [JsonIgnore]
+        public string? CNAME { get; set; }
+    }
 }

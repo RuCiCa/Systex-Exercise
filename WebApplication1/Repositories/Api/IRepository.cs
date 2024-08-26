@@ -12,6 +12,7 @@ namespace WebApplication1.Repositories.Api
         Task<IEnumerable<UnOffset>> GetByTwoKey(string cseq, string bhno, string stockSymbol);
         Task<IEnumerable<ExtendedHCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol);
         Task<IEnumerable<ExtendedHCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate, string stockSymbol);
-
+        Task<IEnumerable<ExtendedHCMIO>> GetByTwoKeyWithTimeForHCMIO(string bhno, string cseq, string sdate, string edate, string stockSymbol);
+        Task<IEnumerable<ExtendedTMHIO>> GetByTwoKeyWithTimeForTMHIO(string bhno, string cseq, string sdate, string edate, string stockSymbol);
     }
 }
