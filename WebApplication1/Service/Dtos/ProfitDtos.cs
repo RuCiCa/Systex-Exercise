@@ -77,14 +77,9 @@ namespace WebApplication1.Service.Dtos
         public decimal? tax { get; set; }
         public List<ProfitSum> profit_sum { get; set; }
     }
-    public class ProfitHCNRH
+    public class ProfitDetailSet
     {
-        public string? cName { get; set; }
-        public HCNRH hcnrh { get; set; }
-    }
-    public class ProfitHCNTD
-    {
-        public string? cName { get; set; }
-        public HCNTD hcntd { get; set; }
+        public List<ProfitDetail> profitDetails { get; set; }
+        public ProfitDetailOut profitDetailOut { get; set; }
     }
 }

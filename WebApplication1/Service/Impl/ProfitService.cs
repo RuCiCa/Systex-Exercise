@@ -30,61 +30,55 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="tables">HCNTD或HCNRH組成的List</param>
         /// <returns>成功會回傳list，用來保存ProfitDetail</returns>
-        public async Task<List<ProfitDetail>> GetProfitDetailList(List<dynamic> tables)
+        public ProfitDetail GetProfitDetail(dynamic table)
         {
             try
             {
-                List<ProfitDetail> list = new List<ProfitDetail>();
+                string tableType = table is ExtendedHCNRH ? "HCNRH" : "HCNTD";
+                string stock = table.STOCK;
+                string tdate = table is ExtendedHCNRH ? table.RDATE : table.TDATE;
+                string dseq = table.BDSEQ;
+                string dno = table.BDNO;
+                Logger.Log(1, "參數", $"未實現損益-個股明細資料 (買入) - 資料庫： {tableType}, stock： {stock}, tdate： {tdate}, dseq： {dseq}, dno： {dno}");
 
-                foreach (var table in tables)
+                decimal cost = table.COST ?? 0m;
+                decimal profitVal = table.COST ?? 0m;
+                decimal pl_ratio = 0m;
+
+                if (cost != 0m)
                 {
-                    string tableType = table is ExtendedHCNRH ? "HCNRH" : "HCNTD";
-                    string stock = table.STOCK;
-                    string tdate = table is ExtendedHCNRH ? table.RDATE : table.TDATE;
-                    string dseq = table.BDSEQ;
-                    string dno = table.BDNO;
-                    Logger.Log(1, "參數", $"未實現損益-個股明細資料 (買入) - 資料庫： {tableType}, stock： {stock}, tdate： {tdate}, dseq： {dseq}, dno： {dno}");
-
-                    decimal cost = table.COST ?? 0m;
-                    decimal profitVal = table.COST ?? 0m;
-                    decimal pl_ratio = 0m;
-
-                    if (cost != 0m)
-                    {
-                        pl_ratio = profitVal / cost * 100;
-                    }
-
-                    ProfitDetail profitDetail = new ProfitDetail()
-                    {
-                        stock = stock,
-                        stocknm = table.CNAME,
-                        tdate = tdate,
-                        dseq = dseq,
-                        dno = dno,
-                        mqty = table.BQTY ?? 0m,
-                        cqty = table.CQTY ?? 0m,
-                        mprice = table.BPRICE.ToString(),
-                        mamt = (table.CQTY * table.BPRICE).ToString(),
-                        cost = cost,
-                        income = table.INCOME ?? 0m,
-                        netamt = -(table.COST ?? 0m),
-                        fee = table.BFEE ?? 0m,
-                        tax = 0m,
-                        ttype = "0",
-                        ttypename = "現買",
-                        bstype = "B",
-                        wtype = table is ExtendedHCNRH ? table.WTYPE : "0",
-                        profit = profitVal,
-                        pl_ratio = pl_ratio.ToString() + "%",
-                        ctype = "0",
-                        ttypename2 = "現買",
-                        ioflag = table is ExtendedHCNRH ? table.IOFLAG : "0",
-                        ioname = "",
-                        adjdate = table is ExtendedHCNRH ? table.ADJDATE : "",
-                    };
-                    list.Add(profitDetail);
+                    pl_ratio = profitVal / cost * 100;
                 }
-                return list;
+
+                ProfitDetail profitDetail = new ProfitDetail()
+                {
+                    stock = stock,
+                    stocknm = table.CNAME,
+                    tdate = tdate,
+                    dseq = dseq,
+                    dno = dno,
+                    mqty = table.BQTY ?? 0m,
+                    cqty = table.CQTY ?? 0m,
+                    mprice = table.BPRICE.ToString(),
+                    mamt = (table.CQTY * table.BPRICE).ToString(),
+                    cost = cost,
+                    income = table.INCOME ?? 0m,
+                    netamt = -(table.COST ?? 0m),
+                    fee = table.BFEE ?? 0m,
+                    tax = 0m,
+                    ttype = "0",
+                    ttypename = "現買",
+                    bstype = "B",
+                    wtype = table is ExtendedHCNRH ? table.WTYPE : "0",
+                    profit = profitVal,
+                    pl_ratio = pl_ratio.ToString() + "%",
+                    ctype = "0",
+                    ttypename2 = "現買",
+                    ioflag = table is ExtendedHCNRH ? table.IOFLAG : "0",
+                    ioname = "",
+                    adjdate = table is ExtendedHCNRH ? table.ADJDATE : "",
+                };
+                return profitDetail;
             }
             catch (Exception ex)
             {
@@ -96,63 +90,55 @@ namespace WebApplication1.Service.Impl
         /// <summary>
         /// 獲取所有的買入個股明細，並依據類型存入不同的資料
         /// </summary>
-        /// <param name="tables">HCNTD或HCNRH組成的List</param>
+        /// <param name="table">HCNTD或HCNRH的表</param>
         /// <returns>成功會回傳list，用來保存ProfitDetailOut</returns>
-        public async Task<List<ProfitDetailOut>> GetProfitDetailOutList(List<dynamic> tables)
+        public ProfitDetailOut GetProfitDetailOut(dynamic table)
         {
             try
             {
-                List<ProfitDetailOut> list = new List<ProfitDetailOut>();
+                string tableType = table is ExtendedHCNRH ? "HCNRH" : "HCNTD";
+                string stock = table.STOCK;
+                string tdate = table is ExtendedHCNRH ? table.RDATE : table.TDATE;
+                string dseq = table.SDSEQ;
+                string dno = table.SDNO;
+                Logger.Log(1, "參數", $"已實現損益 - 個股明細資料 (賣出) - 資料庫： {tableType}, stock： {stock}, tdate： {tdate}, dseq： {dseq}, dno： {dno}");
 
-                foreach (var table in tables)
+                decimal cost = table.COST ?? 0m;
+                decimal profitVal = table.COST ?? 0m;
+                decimal pl_ratio = 0m;
+
+                if (cost != 0m)
                 {
-                    string tableType = table is ExtendedHCNRH ? "HCNRH" : "HCNTD";
-                    string stock = table.STOCK;
-                    string tdate = table is ExtendedHCNRH ? table.RDATE : table.TDATE;
-                    string dseq = table.SDSEQ;
-                    string dno = table.SDNO;
-                    Logger.Log(1, "參數", $"已實現損益 - 個股明細資料 (賣出) - 資料庫： {tableType}, stock： {stock}, tdate： {tdate}, dseq： {dseq}, dno： {dno}");
-
-                    decimal cost = table.COST ?? 0m;
-                    decimal profitVal = table.COST ?? 0m;
-                    decimal pl_ratio = 0m;
-
-
-                    if (cost != 0m)
-                    {
-                        pl_ratio = profitVal / cost * 100;
-                    }
-
-
-                    ProfitDetailOut profitDetailOut = new ProfitDetailOut()
-                    {
-                        stock = stock,
-                        stocknm = table.CNAME,
-                        tdate = tdate,
-                        dseq = dseq,
-                        dno = dno,
-                        mqty = table.SQTY ?? 0m,
-                        cqty = table.CQTY ?? 0m,
-                        mprice = table.SPRICE.ToString(),
-                        mamt = (table.CQTY * table.SPRICE).ToString(),
-                        cost = cost,
-                        income = table.INCOME ?? 0m,
-                        netamt = table.INCOME ?? 0m,
-                        fee = table.SFEE ?? 0m,
-                        tax = 0m,
-                        ttype = "0",
-                        ttypename = "現股",
-                        bstype = "S",
-                        wtype = table is ExtendedHCNRH ? table.WTYPE : "0",
-                        profit = profitVal,
-                        pl_ratio = pl_ratio.ToString() + "%",
-                        ctype = "0",
-                        ttypename2 = table is ExtendedHCNRH ? "現賣" : "賣沖"
-                    };
-                    list.Add(profitDetailOut);
+                    pl_ratio = profitVal / cost * 100;
                 }
 
-                return list;
+                ProfitDetailOut profitDetailOut = new ProfitDetailOut()
+                {
+                    stock = stock,
+                    stocknm = table.CNAME,
+                    tdate = tdate,
+                    dseq = dseq,
+                    dno = dno,
+                    mqty = table.SQTY ?? 0m,
+                    cqty = table.CQTY ?? 0m,
+                    mprice = table.SPRICE.ToString(),
+                    mamt = (table.CQTY * table.SPRICE).ToString(),
+                    cost = cost,
+                    income = table.INCOME ?? 0m,
+                    netamt = table.INCOME ?? 0m,
+                    fee = table.SFEE ?? 0m,
+                    tax = 0m,
+                    ttype = "0",
+                    ttypename = "現股",
+                    bstype = "S",
+                    wtype = table is ExtendedHCNRH ? table.WTYPE : "0",
+                    profit = profitVal,
+                    pl_ratio = pl_ratio.ToString() + "%",
+                    ctype = "0",
+                    ttypename2 = table is ExtendedHCNRH ? "現賣" : "賣沖"
+                };
+
+                return profitDetailOut;
             }
             catch (Exception ex)
             {
@@ -160,6 +146,51 @@ namespace WebApplication1.Service.Impl
                 return null;
             }
 
+        }
+        
+        /// <summary>
+        /// 獲取所有的買入個股明細，並依據類型存入不同的資料
+        /// </summary>
+        /// <param name="tables">HCNTD或HCNRH組成的List</param>
+        /// <returns>成功會回傳list，用來保存ProfitDetailOut</returns>
+        public async Task<List<ProfitDetailSet>> GetProfitDetailSets(List<dynamic> tables)
+        {
+            List<ProfitDetailSet> list = new List<ProfitDetailSet>();
+
+            foreach (dynamic table in tables)
+            {
+                string tdate = table.TDATE ?? string.Empty;
+                string bhno = table.BHNO ?? string.Empty;
+                string bseq = table.BSEQ ?? string.Empty;
+
+                ProfitDetail profitDetail = GetProfitDetail(table);
+                ProfitDetailOut profitDetailOut = GetProfitDetailOut(table);
+
+                var existingSet = list.FirstOrDefault(p =>
+                    p.profitDetailOut.tdate == tdate &&
+                    p.profitDetailOut.dseq == bhno &&
+                    p.profitDetailOut.dno == bseq);
+
+                if (existingSet != null)
+                {
+                    existingSet.profitDetails.Add(profitDetail);
+
+                    List<ProfitDetailOut> combinedOuts = new List<ProfitDetailOut> { existingSet.profitDetailOut, profitDetailOut };
+                    var mergedOuts = await SumProfitDetailOut(combinedOuts);
+                    existingSet.profitDetailOut = mergedOuts.FirstOrDefault();
+                }
+                else
+                {
+                    ProfitDetailSet newSet = new ProfitDetailSet
+                    {
+                        profitDetails = new List<ProfitDetail> { profitDetail },
+                        profitDetailOut = profitDetailOut
+                    };
+                    list.Add(newSet);
+                }
+            }
+
+            return list;
         }
 
         /// <summary>
@@ -224,10 +255,13 @@ namespace WebApplication1.Service.Impl
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public ProfitSum GetProfitSum(ProfitDetailOut profitDetailOut, List<ProfitDetail> profitDetail, string bhno, string cseq)
+        public ProfitSum GetProfitSum(ProfitDetailSet detailSet, string bhno, string cseq)
         {
             try
             {
+                List<ProfitDetail> profitDetail = detailSet.profitDetails;
+                ProfitDetailOut profitDetailOut = detailSet.profitDetailOut;
+
                 string tdate = profitDetailOut.tdate;
                 string dseq = profitDetailOut.dseq;
                 string dno = profitDetailOut.dno;
@@ -291,7 +325,7 @@ namespace WebApplication1.Service.Impl
             {
                 return (await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate)).ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Log(4, "錯誤", $"獲取特定分公司特定帳號在時間範圍內的歷史現股當沖失敗, 錯誤訊息: {ex.Message}");
                 return null;
@@ -324,22 +358,17 @@ namespace WebApplication1.Service.Impl
         /// <summary>
         /// 將所有profitDetailOut依照股票一一取出並進行加總
         /// </summary>
-        /// <param name="profitDetailOut">存放所有加總過的ProfitDetailOut的List</param>
-        /// <param name="profitDetail">存放所有的ProfitDetail的List</param>
         /// <param name="bhno">分公司</param>
-        /// <param name="cseq">帳號</param>
+        /// <param name="cseq">帳號</param>\
+        /// <param name="profitDetailSets">存放所有的ProfitDetail的List跟ProfitDetailOut的變數</param>
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public async Task<List<ProfitSum>> GetProfitSumList(string bhno, string cseq, List<ProfitDetailOut> profitDetailOuts, List<ProfitDetail> profitDetails)
+        public async Task<List<ProfitSum>> GetProfitSumList(string bhno, string cseq, List<ProfitDetailSet> profitDetailSets)
         {
             List<ProfitSum> profitSumList = new List<ProfitSum>();
 
-            foreach (var profitDetailOut in profitDetailOuts)
+            foreach (var profitDetailSet in profitDetailSets)
             {
-                var matchingProfitDetails = profitDetails
-                    .Where(pd => pd.stock == profitDetailOut.stock)
-                    .ToList();
-
-                var profitSum = GetProfitSum(profitDetailOut, matchingProfitDetails, bhno, cseq);
+                var profitSum = GetProfitSum(profitDetailSet, bhno, cseq);
                 if (profitSum is null)
                 {
                     return null;
@@ -383,7 +412,7 @@ namespace WebApplication1.Service.Impl
                 };
                 return profitAccsum;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Log(4, "錯誤", $"已實現損益的帳號匯總獲取失敗, 錯誤訊息: {ex.Message}");
                 return null;
