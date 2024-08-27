@@ -53,15 +53,14 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
         /// <returns>回傳開始日到結束日之間的歷史現股沖銷以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<ExtendedHCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate)
+        public async Task<IEnumerable<HCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate)
         {
             var query = from hcnrh in InMemoryCache.HCNRHData
-                        join mstmb in InMemoryCache.MSTMBData on hcnrh.STOCK equals mstmb.STOCK
                         where hcnrh.CSEQ == cseq &&
                               hcnrh.BHNO == bhno &&
                               string.Compare(hcnrh.TDATE, sdate) >= 0 &&
                               string.Compare(hcnrh.TDATE, edate) <= 0
-                        select new ExtendedHCNRH
+                        select new HCNRH
                         {
                             STOCK = hcnrh.STOCK ?? string.Empty,
                             CSEQ = hcnrh.CSEQ ?? string.Empty,
@@ -92,7 +91,6 @@ namespace WebApplication1.Repositories.Impl
                             STINTAX = hcnrh.STINTAX ?? 0m,
                             IOFLAG = hcnrh.IOFLAG ?? string.Empty,
                             ADJDATE = hcnrh.ADJDATE ?? string.Empty,
-                            CNAME = mstmb.CNAME ?? string.Empty
                         };
 
             return await Task.FromResult(query.ToList());
@@ -106,15 +104,14 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
         /// <returns>回傳開始日到結束日之間的歷史現股當沖以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<ExtendedHCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate)
+        public async Task<IEnumerable<HCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate)
         {
             var query = from hcntd in InMemoryCache.HCNTDData
-                        join mstmb in InMemoryCache.MSTMBData on hcntd.STOCK equals mstmb.STOCK
                         where hcntd.CSEQ == cseq &&
                               hcntd.BHNO == bhno &&
                               string.Compare(hcntd.TDATE, sdate) >= 0 &&
                               string.Compare(hcntd.TDATE, edate) <= 0
-                        select new ExtendedHCNTD
+                        select new HCNTD
                         {
                             STOCK = hcntd.STOCK ?? string.Empty,
                             CSEQ = hcntd.CSEQ ?? string.Empty,
@@ -140,7 +137,6 @@ namespace WebApplication1.Repositories.Impl
                             MODDATE = hcntd.MODDATE ?? string.Empty,
                             MODTIME = hcntd.MODTIME ?? string.Empty,
                             MODUSER = hcntd.MODUSER ?? string.Empty,
-                            CNAME = mstmb.CNAME ?? string.Empty
                         };
 
             return await Task.FromResult(query.ToList());
