@@ -77,54 +77,30 @@ namespace WebApplication1.Controllers
                         Logger.Log(1, "參數", $"HCNTD有{HCNTDList.Count()}筆、HCNRH有{HCNRHList.Count()}筆");
                         List<ProfitDetailOut> profitDetailOuts = new List<ProfitDetailOut>();
                         List<ProfitDetail> profitDetails = new List<ProfitDetail>();
+                        List<ProfitSum> profitSumList = new List<ProfitSum>();
 
                         switch ((HCNTDList.Count() > 0, HCNRHList.Count() > 0))
                         {
                             case (true, true):
                                 {
-                                    List<ProfitDetail> HCNTDDetails = await _profitService.GetProfitDetailList(HCNTDList.Cast<dynamic>().ToList());
-                                    List<ProfitDetail> HCNRHDetails = await _profitService.GetProfitDetailList(HCNRHList.Cast<dynamic>().ToList());
-                                    if (HCNTDDetails is null || HCNRHDetails is null)
-                                    {
-                                        return Ok(await _profitService.GetProfittAccsumFailed("500", $"獲取未實現損益 - 個股明細資料時出現問題"));
-                                    }
-                                    profitDetails = HCNTDDetails.Concat(HCNRHDetails).ToList();
+                                    List<ProfitDetailSet> HCNTDSet = await _profitService.GetProfitDetailSets(HCNTDList.Cast<dynamic>().ToList());
+                                    List<ProfitDetailSet> HCNRHSet = await _profitService.GetProfitDetailSets(HCNRHList.Cast<dynamic>().ToList());
+                                    List<ProfitSum> HCNTDSum = await _profitService.GetProfitSumList(bhno, cseq, HCNTDSet);
+                                    List<ProfitSum> HCNRHSum = await _profitService.GetProfitSumList(bhno, cseq, HCNRHSet);
+                                    profitSumList = HCNRHSum.Concat(HCNTDSum).ToList();
 
-                                    List<ProfitDetailOut> HCNTDDetailOuts = await _profitService.GetProfitDetailOutList(HCNTDList.Cast<dynamic>().ToList());
-                                    List<ProfitDetailOut> HCNRHDetailOuts = await _profitService.GetProfitDetailOutList(HCNRHList.Cast<dynamic>().ToList());
-                                    if (HCNTDDetailOuts is null || HCNRHDetailOuts is null)
-                                    {
-                                        return Ok(await _profitService.GetProfittAccsumFailed("500", $"獲取已實現損益 - 個股明細資料時出現問題"));
-                                    }
-                                    profitDetailOuts = HCNTDDetailOuts.Concat(HCNRHDetailOuts).ToList();
                                     break;
                                 }
                             case (true, false):
                                 {
-                                    profitDetails = await _profitService.GetProfitDetailList(HCNTDList.Cast<dynamic>().ToList());
-                                    if (profitDetails is null)
-                                    {
-                                        return Ok(await _profitService.GetProfittAccsumFailed("500", $"獲取未實現損益 - 個股明細資料時出現問題"));
-                                    }
-                                    profitDetailOuts = await _profitService.GetProfitDetailOutList(HCNTDList.Cast<dynamic>().ToList());
-                                    if (profitDetailOuts is null)
-                                    {
-                                        return Ok(await _profitService.GetProfittAccsumFailed("500", $"獲取已實現損益 - 個股明細資料時出現問題"));
-                                    }
+                                    List<ProfitDetailSet> SetList = await _profitService.GetProfitDetailSets(HCNTDList.Cast<dynamic>().ToList());
+                                    profitSumList = await _profitService.GetProfitSumList(bhno, cseq, SetList);
                                     break;
                                 }
                             case (false, true):
                                 {
-                                    profitDetails = await _profitService.GetProfitDetailList(HCNRHList.Cast<dynamic>().ToList());
-                                    if (profitDetails is null)
-                                    {
-                                        return Ok(await _profitService.GetProfittAccsumFailed("500", $"獲取未實現損益 - 個股明細資料時出現問題"));
-                                    }
-                                    profitDetailOuts = await _profitService.GetProfitDetailOutList(HCNRHList.Cast<dynamic>().ToList());
-                                    if (profitDetailOuts is null)
-                                    {
-                                        return Ok(await _profitService.GetProfittAccsumFailed("500", $"獲取已實現損益 - 個股明細資料時出現問題"));
-                                    }
+                                    List<ProfitDetailSet> SetList = await _profitService.GetProfitDetailSets(HCNRHList.Cast<dynamic>().ToList());
+                                    profitSumList = await _profitService.GetProfitSumList(bhno, cseq, SetList);
                                     break;
                                 }
                             case (false, false):
@@ -132,19 +108,6 @@ namespace WebApplication1.Controllers
                                     Logger.Log(3, "錯誤", $"未找到分公司{bhno}帳號{cseq}在{request.sdate}到{request.Edate}這段期間的交易紀錄");
                                     return Ok(await _profitService.GetProfittAccsumFailed("404", $"未找到分公司{bhno}帳號{cseq}在{request.sdate}到{request.Edate}這段期間的交易"));
                                 }
-                        }
-
-
-                        profitDetailOuts = await _profitService.SumProfitDetailOut(profitDetailOuts);
-                        if (profitDetailOuts is null)
-                        {
-                            return Ok(await _profitService.GetProfittAccsumFailed("500", $"加總已實現損益時出現錯誤"));
-                        }
-
-                        var profitSumList = await _profitService.GetProfitSumList(bhno, cseq, profitDetailOuts, profitDetails);
-                        if (profitDetailOuts is null)
-                        {
-                            return Ok(await _profitService.GetProfittAccsumFailed("500", $"獲取已實現損益-個股彙總資料時出現錯誤"));
                         }
 
                         var response = await _profitService.GetProfittAccsum(profitSumList);

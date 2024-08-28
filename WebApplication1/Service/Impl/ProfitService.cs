@@ -323,7 +323,40 @@ namespace WebApplication1.Service.Impl
             Logger.Log(1, "參數", $"獲取HCNTD table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
             try
             {
-                return (await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate)).ToList();
+                var hcntdList = await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate);
+                var mstmbList = InMemoryCache.MSTMBData;
+                var result = (from hcntd in hcntdList
+                              join mstmb in mstmbList on hcntd.STOCK equals mstmb.STOCK
+                              select new ExtendedHCNTD
+                              {
+                                  STOCK = hcntd.STOCK ?? string.Empty,
+                                  CSEQ = hcntd.CSEQ ?? string.Empty,
+                                  BHNO = hcntd.BHNO ?? string.Empty,
+                                  TDATE = hcntd.TDATE ?? string.Empty,
+                                  BDSEQ = hcntd.BDSEQ ?? string.Empty,
+                                  SDSEQ = hcntd.SDSEQ ?? string.Empty,
+                                  BDNO = hcntd.BDNO ?? string.Empty,
+                                  SDNO = hcntd.SDNO ?? string.Empty,
+                                  CQTY = hcntd.CQTY ?? 0m,
+                                  BPRICE = hcntd.BPRICE ?? 0m,
+                                  BFEE = hcntd.BFEE ?? 0m,
+                                  SPRICE = hcntd.SPRICE ?? 0m,
+                                  SFEE = hcntd.SFEE ?? 0m,
+                                  TAX = hcntd.TAX ?? 0m,
+                                  INCOME = hcntd.INCOME ?? 0m,
+                                  COST = hcntd.COST ?? 0m,
+                                  PROFIT = hcntd.PROFIT ?? 0m,
+                                  BQTY = hcntd.BQTY ?? 0m,
+                                  SQTY = hcntd.SQTY ?? 0m,
+                                  TRDATE = hcntd.TRDATE ?? string.Empty,
+                                  TRTIME = hcntd.TRTIME ?? string.Empty,
+                                  MODDATE = hcntd.MODDATE ?? string.Empty,
+                                  MODTIME = hcntd.MODTIME ?? string.Empty,
+                                  MODUSER = hcntd.MODUSER ?? string.Empty,
+                                  CNAME = mstmb.CNAME ?? string.Empty 
+                              }).ToList();
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -346,7 +379,45 @@ namespace WebApplication1.Service.Impl
             Logger.Log(1, "參數", $"獲取HCNRH table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
             try
             {
-                return (await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate)).ToList();
+                var hcnrhList = await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate);
+                var mstmbList = InMemoryCache.MSTMBData;
+                var result = (from hcnrh in hcnrhList
+                              join mstmb in mstmbList on hcnrh.STOCK equals mstmb.STOCK
+                              select new ExtendedHCNRH
+                              {
+                                  STOCK = hcnrh.STOCK ?? string.Empty,
+                                  CSEQ = hcnrh.CSEQ ?? string.Empty,
+                                  BHNO = hcnrh.BHNO ?? string.Empty,
+                                  TDATE = hcnrh.TDATE ?? string.Empty,
+                                  RDATE = hcnrh.RDATE ?? string.Empty,
+                                  BDSEQ = hcnrh.BDSEQ ?? string.Empty,
+                                  SDSEQ = hcnrh.SDSEQ ?? string.Empty,
+                                  BDNO = hcnrh.BDNO ?? string.Empty,
+                                  SDNO = hcnrh.SDNO ?? string.Empty,
+                                  CQTY = hcnrh.CQTY ?? 0m,
+                                  BPRICE = hcnrh.BPRICE ?? 0m,
+                                  BFEE = hcnrh.BFEE ?? 0m,
+                                  SPRICE = hcnrh.SPRICE ?? 0m,
+                                  SFEE = hcnrh.SFEE ?? 0m,
+                                  TAX = hcnrh.TAX ?? 0m,
+                                  INCOME = hcnrh.INCOME ?? 0m,
+                                  COST = hcnrh.COST ?? 0m,
+                                  PROFIT = hcnrh.PROFIT ?? 0m,
+                                  BQTY = hcnrh.BQTY ?? 0m,
+                                  SQTY = hcnrh.SQTY ?? 0m,
+                                  TRDATE = hcnrh.TRDATE ?? string.Empty,
+                                  TRTIME = hcnrh.TRTIME ?? string.Empty,
+                                  MODDATE = hcnrh.MODDATE ?? string.Empty,
+                                  MODTIME = hcnrh.MODTIME ?? string.Empty,
+                                  MODUSER = hcnrh.MODUSER ?? string.Empty,
+                                  WTYPE = hcnrh.WTYPE ?? string.Empty,
+                                  STINTAX = hcnrh.STINTAX ?? 0m,
+                                  IOFLAG = hcnrh.IOFLAG ?? string.Empty,
+                                  ADJDATE = hcnrh.ADJDATE ?? string.Empty,
+                                  CNAME = mstmb.CNAME ?? string.Empty 
+                              }).ToList();
+
+                return result;
             }
             catch (Exception ex)
             {

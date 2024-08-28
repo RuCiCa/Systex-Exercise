@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\TestProject1\\TestProject1.csproj": {}
+    "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\TestProject1\\TestProject1.csproj": {}
   },
   "projects": {
-    "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\TestProject1\\TestProject1.csproj": {
+    "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\TestProject1\\TestProject1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\TestProject1\\TestProject1.csproj",
+        "projectUniqueName": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\TestProject1\\TestProject1.csproj",
         "projectName": "TestProject1",
-        "projectPath": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\TestProject1\\TestProject1.csproj",
+        "projectPath": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\TestProject1\\TestProject1.csproj",
         "packagesPath": "C:\\Users\\hanbi\\.nuget\\packages\\",
-        "outputPath": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\TestProject1\\obj\\",
+        "outputPath": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\TestProject1\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,8 +33,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\WebApplication1\\WebApplication1.csproj": {
-                "projectPath": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\WebApplication1\\WebApplication1.csproj"
+              "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\WebApplication1\\WebApplication1.csproj": {
+                "projectPath": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\WebApplication1\\WebApplication1.csproj"
               }
             }
           }
@@ -95,14 +95,14 @@
         }
       }
     },
-    "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\WebApplication1\\WebApplication1.csproj": {
+    "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\WebApplication1\\WebApplication1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\WebApplication1\\WebApplication1.csproj",
+        "projectUniqueName": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\WebApplication1\\WebApplication1.csproj",
         "projectName": "WebApplication1",
-        "projectPath": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\WebApplication1\\WebApplication1.csproj",
+        "projectPath": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\WebApplication1\\WebApplication1.csproj",
         "packagesPath": "C:\\Users\\hanbi\\.nuget\\packages\\",
-        "outputPath": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\WebApplication1\\obj\\",
+        "outputPath": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\WebApplication1\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
