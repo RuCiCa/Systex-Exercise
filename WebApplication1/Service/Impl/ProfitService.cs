@@ -324,7 +324,7 @@ namespace WebApplication1.Service.Impl
             Logger.Log(1, "參數", $"獲取HCNTD table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
             try
             {
-                var hcntdList = await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate);
+                var hcntdList = await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate, stockSymbol);
                 var mstmbList = InMemoryCache.MSTMBData;
                 var result = (from hcntd in hcntdList
                               join mstmb in mstmbList on hcntd.STOCK equals mstmb.STOCK
@@ -381,7 +381,7 @@ namespace WebApplication1.Service.Impl
             Logger.Log(1, "參數", $"獲取HCNRH table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
             try
             {
-                var hcnrhList = await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate);
+                var hcnrhList = await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate, stockSymbol);
                 var mstmbList = InMemoryCache.MSTMBData;
                 var result = (from hcnrh in hcnrhList
                               join mstmb in mstmbList on hcnrh.STOCK equals mstmb.STOCK

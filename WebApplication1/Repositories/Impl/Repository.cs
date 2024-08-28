@@ -56,7 +56,7 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="edate">結束日</param>
         /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的歷史現股沖銷以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<ExtendedHCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol)
+        public async Task<IEnumerable<HCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from hcnrh in InMemoryCache.HCNRHData
                         where hcnrh.CSEQ == cseq &&
@@ -109,7 +109,7 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="edate">結束日</param>
         /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的歷史現股當沖以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<ExtendedHCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate, string stockSymbol)
+        public async Task<IEnumerable<HCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from hcntd in InMemoryCache.HCNTDData
                         where hcntd.CSEQ == cseq &&
@@ -157,7 +157,7 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="edate">結束日</param>
         /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的TMHIO以及CNAME</returns>
-        public async Task<IEnumerable<ExtendedTMHIO>> GetByTwoKeyWithTimeForTMHIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
+        public async Task<IEnumerable<TMHIO>> GetByTwoKeyWithTimeForTMHIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from tmhio in InMemoryCache.TMHIOData
                         join mstmb in InMemoryCache.MSTMBData on tmhio.STOCK equals mstmb.STOCK
@@ -166,7 +166,7 @@ namespace WebApplication1.Repositories.Impl
                               string.Compare(tmhio.TDATE, sdate) >= 0 &&
                               string.Compare(tmhio.TDATE, edate) <= 0 &&
                               (string.IsNullOrEmpty(stockSymbol) || tmhio.STOCK == stockSymbol)
-                        select new ExtendedTMHIO
+                        select new TMHIO
                         {
                             TDATE = tmhio.TDATE ?? string.Empty,
                             BHNO = tmhio.BHNO ?? string.Empty,
@@ -188,7 +188,6 @@ namespace WebApplication1.Repositories.Impl
                             MODDATE = tmhio.MODDATE ?? string.Empty,
                             MODTIME = tmhio.MODTIME ?? string.Empty,
                             MODUSER = tmhio.MODUSER ?? string.Empty,
-                            CNAME = mstmb.CNAME ?? string.Empty  // This is added from MSTMB
                         };
 
             return await Task.FromResult(query.ToList());
@@ -204,7 +203,7 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="edate">結束日</param>
         /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的歷史現股當沖以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<ExtendedHCMIO>> GetByTwoKeyWithTimeForHCMIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
+        public async Task<IEnumerable<HCMIO>> GetByTwoKeyWithTimeForHCMIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from hcmio in InMemoryCache.HCMIOData
                         join mstmb in InMemoryCache.MSTMBData on hcmio.STOCK equals mstmb.STOCK
@@ -213,7 +212,7 @@ namespace WebApplication1.Repositories.Impl
                               string.Compare(hcmio.TDATE, sdate) >= 0 &&
                               string.Compare(hcmio.TDATE, edate) <= 0 &&
                               (string.IsNullOrEmpty(stockSymbol) || hcmio.STOCK == stockSymbol)
-                        select new ExtendedHCMIO
+                        select new HCMIO
                         {
                             TDATE = hcmio.TDATE ?? string.Empty,
                             BHNO = hcmio.BHNO ?? string.Empty,
@@ -256,7 +255,6 @@ namespace WebApplication1.Repositories.Impl
                             MODDATE = hcmio.MODDATE ?? string.Empty,
                             MODTIME = hcmio.MODTIME ?? string.Empty,
                             MODUSER = hcmio.MODUSER ?? string.Empty,
-                            CNAME = mstmb.CNAME ?? string.Empty  // This is added from MSTMB
                         };
 
             return await Task.FromResult(query.ToList());

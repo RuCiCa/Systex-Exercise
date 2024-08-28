@@ -8,9 +8,9 @@ namespace WebApplication1.Service.Api
     public interface IProfileService
     {
         Task<List<Profile>> GetProfileList(List<dynamic> list);
-        Task<BillSum> GetBillSum(List<dynamic> list);
-        Task<ProfileSum> GetProfileSum(BillSum bill, List<Profile> profiles);
-        Task<ProfileSum> GetProfileSumFailed(string errorcode, string errormsg);
+        Task<BillSum> GetBillSum(List<Profile> list);
+        Task<ProfileSum> GetProfileSum(BillSum bill, List<Profile> list);
+        Task<ProfileSum> GetProfileSumFailed(string errcode, string errmsg);
         Task<List<ExtendedTMHIO>> GetTMHIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
         Task<List<ExtendedHCMIO>> GetHCMIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
     }

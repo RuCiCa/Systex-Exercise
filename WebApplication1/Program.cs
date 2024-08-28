@@ -9,6 +9,7 @@ using WebApplication1.Service.Impl;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebApplication1.Repositories.Api;
 using WebApplication1.Repositories.Impl;
+using WebApplication1.service.dtos;
 
 //Util util = new Util();
 //util.InsertFileDB("D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\題目一_Insert_MSTMB.txt");
@@ -38,6 +39,9 @@ builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
 
     containerBuilder.RegisterType<ProfitAccsum>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<ProfitService>().As<IProfitService>().InstancePerLifetimeScope();
+
+    containerBuilder.RegisterType<ProfileSum>().AsSelf().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<ProfileService>().As<IProfileService>().InstancePerLifetimeScope();
 });
 
 var app = builder.Build();
