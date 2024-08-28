@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UngOZ9uaRhE=",
+  "dgSpecHash": "GZo7M/aLW+c=",
   "success": true,
-  "projectFilePath": "D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\WebApplication1\\TestProject1\\TestProject1.csproj",
+  "projectFilePath": "D:\\vs_studio\\vs_studio_workspace\\帳中練習題\\TestProject1\\TestProject1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hanbi\\.nuget\\packages\\autofac\\8.0.0\\autofac.8.0.0.nupkg.sha512",
     "C:\\Users\\hanbi\\.nuget\\packages\\autofac.extensions.dependencyinjection\\9.0.0\\autofac.extensions.dependencyinjection.9.0.0.nupkg.sha512",
