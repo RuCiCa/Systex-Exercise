@@ -4,6 +4,7 @@ using WebApplication1.Common.HCN;
 using WebApplication1.service.dtos;
 using WebApplication1.Service.Api;
 using WebApplication1.Service.Dtos;
+using WebApplication1.Repositories.Api;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -11,7 +12,18 @@ namespace WebApplication1.Service.Impl
 {
     public class ProfileService : IProfileService
     {
-        Task<List<Profile>> GetProfileList(List<dynamic> tables)
+        private readonly MyDbContext _context;
+        private readonly ProfileSum _profileSum;
+        private readonly IRepository _repository;
+
+
+        public ProfileService(MyDbContext context, ProfileSum profileSum, IRepository repository)
+        {
+            _context = context;
+            _profileSum = profileSum;
+            _repository = repository;
+        }
+        public async Task<List<Profile>> GetProfileList(List<dynamic> tables)
         {
             List<Profile> list = new List<Profile>();
             try
@@ -93,7 +105,7 @@ namespace WebApplication1.Service.Impl
                     };
                     list.Add(profile);
                 }
-                return Task.FromResult(list);
+                return list;
             }
             catch (Exception ex)
             {
@@ -101,7 +113,7 @@ namespace WebApplication1.Service.Impl
                 return null;
             }
         }
-        Task<BillSum> GetBillSum(List<Profile> list)
+        public async Task<BillSum> GetBillSum(List<Profile> list)
         {
             try
             {
@@ -126,14 +138,14 @@ namespace WebApplication1.Service.Impl
                     bqty = bqty, 
                     sqty = sqty
                 };
-                return Task.FromResult(billSum);
+                return billSum;
             }
             catch (Exception)
             {
                 return null;
             }
         }
-        Task<ProfileSum> GetProfileSum(BillSum bill, List<Profile> list)
+        public async Task<ProfileSum> GetProfileSum(BillSum bill, List<Profile> list)
         {
             try
             {
@@ -156,14 +168,14 @@ namespace WebApplication1.Service.Impl
                     profile = profile
                 };
 
-                return Task.FromResult(profileSum);
+                return profileSum;
             }
             catch (Exception)
             {
                 return null;
             }
         }
-        Task<ProfileSum> GetProfileSumFailed(string errcode, string errmsg)
+        public async Task<ProfileSum> GetProfileSumFailed(string errcode, string errmsg)
         {
             ProfileSum profileSum = new ProfileSum()
             {
@@ -173,7 +185,110 @@ namespace WebApplication1.Service.Impl
 
             return profileSum;
         }
-        Task<List<ExtendedTMHIO>> GetTMHIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
-        Task<List<ExtendedHCMIO>> GetHCMIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
+        public async Task<List<ExtendedTMHIO>> GetTMHIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol)
+        {
+            Logger.Log(1, "參數", $"獲取HCNTD table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
+            try
+            {
+                var tmhioList = await _repository.GetByTwoKeyWithTimeForTMHIO(bhno, cseq, sdate, edate, stockSymbol);
+                var mstmbList = InMemoryCache.MSTMBData;
+                var result = (from tmhio in tmhioList
+                              join mstmb in mstmbList on tmhio.STOCK equals mstmb.STOCK
+                              select new ExtendedTMHIO
+                              {
+                                  TDATE = tmhio.TDATE ?? string.Empty,
+                                  BHNO = tmhio.BHNO ?? string.Empty,
+                                  DSEQ = tmhio.DSEQ ?? string.Empty,
+                                  JRNUM = tmhio.JRNUM ?? string.Empty,
+                                  MTYPE = tmhio.MTYPE ?? string.Empty,
+                                  CSEQ = tmhio.CSEQ ?? string.Empty,
+                                  TTYPE = tmhio.TTYPE ?? string.Empty,
+                                  STYPE = tmhio.STYPE ?? string.Empty,
+                                  BSTYPE = tmhio.BSTYPE ?? string.Empty,
+                                  STOCK = tmhio.STOCK ?? string.Empty,
+                                  QTY = tmhio.QTY ?? 0m,
+                                  PRICE = tmhio.PRICE,
+                                  SALES = tmhio.SALES ?? string.Empty,
+                                  ORIGN = tmhio.ORIGN ?? string.Empty,
+                                  MTIME = tmhio.MTIME ?? string.Empty,
+                                  TRDATE = tmhio.TRDATE ?? string.Empty,
+                                  TRTIME = tmhio.TRTIME ?? string.Empty,
+                                  MODDATE = tmhio.MODDATE ?? string.Empty,
+                                  MODTIME = tmhio.MODTIME ?? string.Empty,
+                                  MODUSER = tmhio.MODUSER ?? string.Empty,
+                                  CNAME = mstmb.CNAME ?? string.Empty
+                              }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取特定分公司特定帳號在時間範圍內的歷史現股當沖失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
+        }
+        public async Task<List<ExtendedHCMIO>> GetHCMIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol)
+        {
+            Logger.Log(1, "參數", $"獲取HCNTD table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
+            try
+            {
+                var hcmioList = await _repository.GetByTwoKeyWithTimeForHCMIO(bhno, cseq, sdate, edate, stockSymbol);
+                var mstmbList = InMemoryCache.MSTMBData;
+                var result = (from hcmio in hcmioList
+                              join mstmb in mstmbList on hcmio.STOCK equals mstmb.STOCK
+                              select new ExtendedHCMIO
+                              {
+                                  TDATE = hcmio.TDATE ?? string.Empty,
+                                  BHNO = hcmio.BHNO ?? string.Empty,
+                                  CSEQ = hcmio.CSEQ ?? string.Empty,
+                                  DSEQ = hcmio.DSEQ ?? string.Empty,
+                                  DNO = hcmio.DNO ?? string.Empty,
+                                  WTYPE = hcmio.WTYPE ?? string.Empty,
+                                  STOCK = hcmio.STOCK ?? string.Empty,
+                                  TTYPE = hcmio.TTYPE ?? string.Empty,
+                                  ETYPE = hcmio.ETYPE ?? string.Empty,
+                                  BSTYPE = hcmio.BSTYPE ?? string.Empty,
+                                  PRICE = hcmio.PRICE ?? 0m,
+                                  QTY = hcmio.QTY ?? 0m,
+                                  FEE = hcmio.FEE ?? 0m,
+                                  AMT = hcmio.AMT ?? 0m,
+                                  TAX = hcmio.TAX ?? 0m,
+                                  RVINT = hcmio.RVINT ?? 0m,
+                                  NETAMT = hcmio.NETAMT ?? 0m,
+                                  DBFEE = hcmio.DBFEE ?? 0m,
+                                  CRAMT = hcmio.CRAMT ?? 0m,
+                                  DNAMT = hcmio.DNAMT ?? 0m,
+                                  CRINT = hcmio.CRINT ?? 0m,
+                                  DNINT = hcmio.DNINT ?? 0m,
+                                  DLFEE = hcmio.DLFEE ?? 0m,
+                                  BFINT = hcmio.BFINT ?? 0m,
+                                  OBAMT = hcmio.OBAMT ?? 0m,
+                                  INTAX = hcmio.INTAX ?? 0m,
+                                  SFCODE = hcmio.SFCODE ?? string.Empty,
+                                  CDTDQTY = hcmio.CDTDQTY ?? 0m,
+                                  ORIGN = hcmio.ORIGN ?? string.Empty,
+                                  SALES = hcmio.SALES ?? string.Empty,
+                                  DATAFLAG = hcmio.DATAFLAG ?? string.Empty,
+                                  IOFLAG = hcmio.IOFLAG ?? string.Empty,
+                                  ADJCOST = hcmio.ADJCOST ?? 0m,
+                                  ADJDATE = hcmio.ADJDATE ?? string.Empty,
+                                  STINTAX = hcmio.STINTAX ?? 0m,
+                                  HEALTHFEE = hcmio.HEALTHFEE ?? 0m,
+                                  TRDATE = hcmio.TRDATE ?? string.Empty,
+                                  TRTIME = hcmio.TRTIME ?? string.Empty,
+                                  MODDATE = hcmio.MODDATE ?? string.Empty,
+                                  MODTIME = hcmio.MODTIME ?? string.Empty,
+                                  MODUSER = hcmio.MODUSER ?? string.Empty,
+                                  CNAME = mstmb.CNAME ?? string.Empty
+                              }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取特定分公司特定帳號在時間範圍內的歷史現股當沖失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

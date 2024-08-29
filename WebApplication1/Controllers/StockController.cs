@@ -9,6 +9,8 @@ using WebApplication1.Common.HCN;
 using WebApplication1.Repositories.Impl;
 using System.Collections.Generic;
 using System.Linq;
+using WebApplication1.Service.Impl;
+using WebApplication1.service.dtos;
 
 namespace WebApplication1.Controllers
 {
@@ -19,12 +21,14 @@ namespace WebApplication1.Controllers
         
         private readonly IUnOffsetService _unOffsetService;
         private readonly IProfitService _profitService;
+        private readonly IProfileService _profileService;
         private readonly IErrorService _errorService;
 
-        public StockController(IUnOffsetService unOffsetService, IProfitService profitService, IErrorService errorService)
+        public StockController(IUnOffsetService unOffsetService, IProfitService profitService, IProfileService profileService, IErrorService errorService)
         {
             _unOffsetService = unOffsetService;
             _profitService = profitService;
+            _profileService = profileService;
             _errorService = errorService;
         }
 
@@ -123,6 +127,79 @@ namespace WebApplication1.Controllers
                     {
                         Logger.Log(4, "錯誤", $"搜尋{bhno}帳號{cseq}的交易紀錄時出現了錯誤：{ex}");
                         var response = await _profitService.GetProfittAccsumFailed("500", "Internal Server Error");
+                        return Ok(response);
+                    }
+                case ("0003"):
+                    try
+                    {
+                        Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
+                        List<ExtendedTMHIO> TMHIOList = await _profileService.GetTMHIOList(bhno, cseq, request.sdate, request.Edate, stockSymbol);
+                        List<ExtendedHCMIO> HCMIOList = await _profileService.GetHCMIOList(bhno, cseq, request.sdate, request.Edate, stockSymbol);
+
+                        Logger.Log(1, "參數", $"HCMIO有{TMHIOList.Count()}筆、HCMIO有{HCMIOList.Count()}筆");
+                        List<Profile> profileList = new List<Profile>();
+                        BillSum billSum = new BillSum();
+                        ProfileSum profileSum = new ProfileSum();
+
+                        switch ((TMHIOList.Count() > 0, HCMIOList.Count() > 0))
+                        {
+                            case (true, true):
+                                {
+                                    List<Profile> TMHIOProfileList = await _profileService.GetProfileList(TMHIOList.Cast<dynamic>().ToList());
+                                    if (TMHIOProfileList is null)
+                                    {
+                                        return Ok(await _profileService.GetProfileSumFailed("500", $"獲取TMHIO對帳單 - 明細時出現錯誤"));
+                                    }
+                                    List<Profile> HCMIOProfileList = await _profileService.GetProfileList(HCMIOList.Cast<dynamic>().ToList());
+                                    if (HCMIOProfileList is null)
+                                    {
+                                        return Ok(await _profileService.GetProfileSumFailed("500", $"獲取HCMIO對帳單 - 明細時出現錯誤"));
+                                    }
+                                    profileList = TMHIOProfileList.Concat(HCMIOProfileList).ToList();
+                                    break;
+                                }
+                            case (true, false):
+                                {
+                                    profileList = await _profileService.GetProfileList(TMHIOList.Cast<dynamic>().ToList());
+                                    if (profileList is null)
+                                    {
+                                        return Ok(await _profileService.GetProfileSumFailed("500", $"TMHIO獲取對帳單 - 明細時出現錯誤"));
+                                    }
+                                    break;
+                                }
+                            case (false, true):
+                                {
+                                    profileList = await _profileService.GetProfileList(HCMIOList.Cast<dynamic>().ToList());
+                                    if (profileList is null)
+                                    {
+                                        return Ok(await _profileService.GetProfileSumFailed("500", $"獲取HCMIO對帳單 - 明細時出現錯誤"));
+                                    }
+                                    break;
+                                }
+                            case (false, false):
+                                {
+                                    Logger.Log(3, "錯誤", $"未找到分公司{bhno}帳號{cseq}在{request.sdate}到{request.Edate}這段期間的交易紀錄");
+                                    return Ok(await _profileService.GetProfileSumFailed("404", $"未找到分公司{bhno}帳號{cseq}在{request.sdate}到{request.Edate}這段期間的交易"));
+                                }
+                        }
+                        billSum = await _profileService.GetBillSum(profileList);
+                        if (billSum is null)
+                        {
+                            return Ok(await _profileService.GetProfileSumFailed("500", $"獲取對帳單匯總資料時出現錯誤"));
+                        }
+
+                        profileSum = await _profileService.GetProfileSum(billSum, profileList);
+                        if (profileSum is null)
+                        {
+                            return Ok(await _profileService.GetProfileSumFailed("500", $"獲取對帳單 - 彙總資料時出現錯誤"));
+                        }
+
+                        var response = profileSum;
+                        return Ok(response);
+                    }
+                    catch
+                    {
+                        var response = await _profileService.GetProfileSumFailed("500", "Internal Server Error");
                         return Ok(response);
                     }
                 default:
