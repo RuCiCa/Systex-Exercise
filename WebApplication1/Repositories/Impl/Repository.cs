@@ -175,7 +175,7 @@ namespace WebApplication1.Repositories.Impl
                             MTYPE = tmhio.MTYPE ?? string.Empty,
                             CSEQ = tmhio.CSEQ ?? string.Empty,
                             TTYPE = tmhio.TTYPE ?? string.Empty,
-                            STYPE = tmhio.STYPE ?? string.Empty,
+                            ETYPE = tmhio.ETYPE ?? string.Empty,
                             BSTYPE = tmhio.BSTYPE ?? string.Empty,
                             STOCK = tmhio.STOCK ?? string.Empty,
                             QTY = tmhio.QTY ?? 0m,

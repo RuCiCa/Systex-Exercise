@@ -12,7 +12,7 @@ namespace WebApplication1.Common
         public string MTYPE { get; set; }  
         public string CSEQ { get; set; }  
         public string TTYPE { get; set; }  
-        public string STYPE { get; set; }  
+        public string ETYPE { get; set; }  
         public string BSTYPE { get; set; }  
         public string STOCK { get; set; }  
         public decimal? QTY { get; set; }  

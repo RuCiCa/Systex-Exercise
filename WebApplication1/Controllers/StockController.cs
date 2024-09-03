@@ -136,7 +136,7 @@ namespace WebApplication1.Controllers
                         List<ExtendedTMHIO> TMHIOList = await _profileService.GetTMHIOList(bhno, cseq, request.sdate, request.Edate, stockSymbol);
                         List<ExtendedHCMIO> HCMIOList = await _profileService.GetHCMIOList(bhno, cseq, request.sdate, request.Edate, stockSymbol);
 
-                        Logger.Log(1, "把计", $"HCMIOΤ{TMHIOList.Count()}掸HCMIOΤ{HCMIOList.Count()}掸");
+                        Logger.Log(1, "把计", $"TMHIOΤ{TMHIOList.Count()}掸HCMIOΤ{HCMIOList.Count()}掸");
                         List<Profile> profileList = new List<Profile>();
                         BillSum billSum = new BillSum();
                         ProfileSum profileSum = new ProfileSum();
