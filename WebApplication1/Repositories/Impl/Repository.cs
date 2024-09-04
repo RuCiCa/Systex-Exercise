@@ -58,6 +58,7 @@ namespace WebApplication1.Repositories.Impl
         /// <returns>肚秨﹍ら挡らぇ丁菌瞷≧綪のCNAME蛤STOCK</returns>
         public async Task<IEnumerable<HCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
+            Logger.Log(1, "把计", $"sdate{string.Compare("20201228", sdate)}, edate{string.Compare("20201228", edate)}");
             var query = from hcnrh in InMemoryCache.HCNRHData
                         where hcnrh.CSEQ == cseq &&
                               hcnrh.BHNO == bhno &&
@@ -96,6 +97,22 @@ namespace WebApplication1.Repositories.Impl
                             IOFLAG = hcnrh.IOFLAG ?? string.Empty,
                             ADJDATE = hcnrh.ADJDATE ?? string.Empty,
                         };
+
+            //foreach (var hcnrh in InMemoryCache.HCNRHData)
+            //{
+            //    var compareSDate = string.Compare(hcnrh.TDATE, sdate);
+            //    var compareEDate = string.Compare(hcnrh.TDATE, edate);
+            //    var matchesCSEQ = hcnrh.CSEQ == cseq;
+            //    var matchesBHNO = hcnrh.BHNO == bhno;
+            //    var dateInRange = compareSDate >= 0 && compareEDate <= 0;
+            //    var stockMatch = string.IsNullOrEmpty(stockSymbol) || hcnrh.STOCK == stockSymbol;
+            //    Logger.Log(1, "把计", $"Record: CSEQ={hcnrh.CSEQ}, BHNO={hcnrh.BHNO}, TDATE={hcnrh.TDATE}, SDateComparison={compareSDate}, EDateComparison={compareEDate}, MatchesCSEQ={matchesCSEQ}, MatchesBHNO={matchesBHNO}, DateInRange={dateInRange}, StockMatch={stockMatch}");
+
+            //    if (!(matchesCSEQ && matchesBHNO && dateInRange && stockMatch))
+            //    {
+            //        Logger.Log(1, "把计", $"Record did not match query: CSEQ={hcnrh.CSEQ}, BHNO={hcnrh.BHNO}, TDATE={hcnrh.TDATE}");
+            //    }
+            //}
 
             return await Task.FromResult(query.ToList());
         }
@@ -160,7 +177,6 @@ namespace WebApplication1.Repositories.Impl
         public async Task<IEnumerable<TMHIO>> GetByTwoKeyWithTimeForTMHIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from tmhio in InMemoryCache.TMHIOData
-                        join mstmb in InMemoryCache.MSTMBData on tmhio.STOCK equals mstmb.STOCK
                         where tmhio.CSEQ == cseq &&
                               tmhio.BHNO == bhno &&
                               string.Compare(tmhio.TDATE, sdate) >= 0 &&
@@ -206,7 +222,6 @@ namespace WebApplication1.Repositories.Impl
         public async Task<IEnumerable<HCMIO>> GetByTwoKeyWithTimeForHCMIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from hcmio in InMemoryCache.HCMIOData
-                        join mstmb in InMemoryCache.MSTMBData on hcmio.STOCK equals mstmb.STOCK
                         where hcmio.CSEQ == cseq &&
                               hcmio.BHNO == bhno &&
                               string.Compare(hcmio.TDATE, sdate) >= 0 &&

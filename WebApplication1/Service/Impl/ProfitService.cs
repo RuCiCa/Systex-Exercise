@@ -160,16 +160,16 @@ namespace WebApplication1.Service.Impl
             foreach (dynamic table in tables)
             {
                 string tdate = table.TDATE ?? string.Empty;
-                string bhno = table.BHNO ?? string.Empty;
-                string bseq = table.BSEQ ?? string.Empty;
+                string dseq = table.SDSEQ ?? string.Empty;
+                string dno = table.SDNO ?? string.Empty;
 
                 ProfitDetail profitDetail = GetProfitDetail(table);
                 ProfitDetailOut profitDetailOut = GetProfitDetailOut(table);
 
                 var existingSet = list.FirstOrDefault(p =>
                     p.profitDetailOut.tdate == tdate &&
-                    p.profitDetailOut.dseq == bhno &&
-                    p.profitDetailOut.dno == bseq);
+                    p.profitDetailOut.dseq == dseq &&
+                    p.profitDetailOut.dno == dno);
 
                 if (existingSet != null)
                 {
