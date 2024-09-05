@@ -48,6 +48,7 @@ namespace WebApplication1.Service.Impl
                 if (cost != 0m)
                 {
                     pl_ratio = profitVal / cost * 100;
+                    pl_ratio = Math.Round(pl_ratio, 2);
                 }
 
                 ProfitDetail profitDetail = new ProfitDetail()
@@ -98,18 +99,19 @@ namespace WebApplication1.Service.Impl
             {
                 string tableType = table is ExtendedHCNRH ? "HCNRH" : "HCNTD";
                 string stock = table.STOCK;
-                string tdate = table is ExtendedHCNRH ? table.RDATE : table.TDATE;
+                string tdate = table.TDATE;
                 string dseq = table.SDSEQ;
                 string dno = table.SDNO;
                 Logger.Log(1, "參數", $"已實現損益 - 個股明細資料 (賣出) - 資料庫： {tableType}, stock： {stock}, tdate： {tdate}, dseq： {dseq}, dno： {dno}");
 
                 decimal cost = table.COST ?? 0m;
-                decimal profitVal = table.COST ?? 0m;
+                decimal profitVal = table.PROFIT ?? 0m;
                 decimal pl_ratio = 0m;
 
                 if (cost != 0m)
                 {
                     pl_ratio = profitVal / cost * 100;
+                    pl_ratio = Math.Round(pl_ratio, 2);
                 }
 
                 ProfitDetailOut profitDetailOut = new ProfitDetailOut()
@@ -127,7 +129,7 @@ namespace WebApplication1.Service.Impl
                     income = table.INCOME ?? 0m,
                     netamt = table.INCOME ?? 0m,
                     fee = table.SFEE ?? 0m,
-                    tax = 0m,
+                    tax = table.TAX,
                     ttype = "0",
                     ttypename = "現股",
                     bstype = "S",
@@ -223,14 +225,14 @@ namespace WebApplication1.Service.Impl
                             income = g.Sum(t => t.income),
                             netamt = g.Sum(t => t.netamt),
                             fee = g.Sum(t => t.fee),
-                            tax = 0m,
+                            tax = g.Sum(t => t.tax),
                             ttype = "0",
                             ttypename = "現股",
                             bstype = "S",
                             wtype = g.FirstOrDefault()?.wtype,
                             profit = g.Sum(t => t.profit),
                             pl_ratio = g.Sum(t => t.cost) != 0m
-                                ? ((g.Sum(t => t.profit) / g.Sum(t => t.cost)) * 100m).ToString() + "%"
+                                ? $"{(g.Sum(t => t.profit) / g.Sum(t => t.cost) * 100m):F2}%"
                                 : "N/A",
                             ctype = "0",
                             ttypename2 = g.FirstOrDefault()?.ttypename2,
@@ -269,10 +271,11 @@ namespace WebApplication1.Service.Impl
 
                 decimal? profit = profitDetailOut.profit;
                 decimal? cost = profitDetailOut.cost;
-                decimal? pl_ratio = 0m;
-                if (cost != 0m)
+                decimal pl_ratio = 0m;
+                if (cost.HasValue && cost.Value != 0m)
                 {
-                    pl_ratio = profit / cost * 100;
+                    pl_ratio = profit.HasValue ? (profit.Value / cost.Value * 100m) : 0m;
+                    pl_ratio = Math.Round(pl_ratio, 2);
                 }
                 ProfitSum profitSum = new ProfitSum()
                 {
@@ -463,10 +466,11 @@ namespace WebApplication1.Service.Impl
             {
                 decimal? profit = list.Sum(t => t.profit);
                 decimal? cost = list.Sum(t => t.cost);
-                decimal? pl_ratio = 0m;
-                if (cost != 0m)
+                decimal pl_ratio = 0m;
+                if (cost.HasValue && cost.Value != 0m) // 檢查 cost 是否有值且不為 0
                 {
-                    pl_ratio = profit / cost * 100;
+                    pl_ratio = profit.HasValue ? (profit.Value / cost.Value * 100m) : 0m; // 檢查 profit 是否有值
+                    pl_ratio = Math.Round(pl_ratio, 2);
                 }
 
                 ProfitAccsum profitAccsum = new ProfitAccsum()
