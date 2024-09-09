@@ -6,17 +6,21 @@ using WebApplication1.Service.Dtos;
 using WebApplication1.Service.Impl;
 using WebApplication1.Common.HCN;
 using WebApplication1.service.dtos;
+using WebApplication1.Common;
+using WebApplication1.Service.Api;
 
 namespace TestProject1
 {
     public class ProfitServiceTests
     {
         private ProfitService _profitService;
+        private Calc _calc;
 
         [SetUp]
         public void Setup()
         {
-            _profitService = new ProfitService(null, new ProfitAccsum(), null);
+            _calc = new Calc();
+            _profitService = new ProfitService(null, new ProfitAccsum(), null, _calc); // ªì©l¤Æ ProfileService
         }
 
         [Test]
