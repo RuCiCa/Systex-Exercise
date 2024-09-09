@@ -10,13 +10,41 @@ namespace WebApplication1.Service.Impl
     public class UnOffsetService : IUnOffsetService
     {
         private readonly UnOffsetAccsum _unOffsetAccsum;
-        private readonly IRepository _repository;
+        private readonly IUnOffsetRepository _repository;
+        private readonly Calc _calc;
 
-
-        public UnOffsetService(UnOffsetAccsum unOffsetAccsum, IRepository repository)
+        public UnOffsetService(UnOffsetAccsum unOffsetAccsum, IUnOffsetRepository repository, Calc calc)
         {
+            _calc = calc;
             _unOffsetAccsum = unOffsetAccsum;
             _repository = repository;
+        }
+
+        public async Task<List<UnOffset>> GetUnOffsetList(string bhno, string cseq, string stockSymbol)
+        {
+            Logger.Log(1, "參數", $"獲取TCNUD與MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+            try
+            {
+                // 使用剛剛的 GetByTwoKey 函數來獲取 TCNUD 資料並與 MSTMB 進行 join
+                var tcnudList = await _repository.GetByTwoKey(bhno, cseq, stockSymbol);
+                var mstmbList = InMemoryCache.MSTMBData;
+
+                var result = (from tcnud in tcnudList
+                              join mstmb in mstmbList on tcnud.STOCK equals mstmb.STOCK
+                              select new UnOffset
+                              {
+                                  TCNUD = tcnud,
+                                  CNAME = mstmb.CNAME ?? string.Empty,
+                                  CPRICE = mstmb.CPRICE ?? 0m
+                              }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取TCNUD與MSTMB失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>
@@ -104,17 +132,11 @@ namespace WebApplication1.Service.Impl
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
         /// <returns>成功會回傳unOffsetDetailList，用來保存unOffsetDetail</returns>
-        public async Task<List<UnOffsetDetail>> GetUnOffsetDetailList(string bhno, string cseq, string stockSymbol)
+        public async Task<List<UnOffsetDetail>> GetUnOffsetDetailList(List<UnOffset> list)
         {
             //建立一個dict，然後使用StringArrayComparer來對作為key的string[]檢查
             var unOffsetDetailList = new List<UnOffsetDetail>();
-            var list = (await _repository.GetByTwoKey(bhno, cseq, stockSymbol)).ToList();
-            if (list.Count == 0)
-            {
-                Logger.Log(3, "警告", $"資料庫內找不到分公司{bhno}帳號{cseq}的交易紀錄");
-                return [] ;
-            }
-            Logger.Log(0, "成功", $"搜尋到{bhno}帳號{cseq}的{list.Count}筆交易紀錄");
+
 
             //List LinQ
             foreach (var unOffset in list)

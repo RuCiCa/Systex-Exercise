@@ -14,11 +14,13 @@ namespace WebApplication1.Service.Impl
     {
         private readonly MyDbContext _context;
         private readonly ProfitAccsum _profitAccsum;
-        private readonly IRepository _repository;
+        private readonly IProfitRepository _repository;
+        private readonly Calc _calc;
 
 
-        public ProfitService(MyDbContext context, ProfitAccsum profitAccsum, IRepository repository)
+        public ProfitService(MyDbContext context, ProfitAccsum profitAccsum, IProfitRepository repository, Calc calc)
         {
+            _calc = calc;
             _context = context;
             _profitAccsum = profitAccsum;
             _repository = repository;
@@ -28,8 +30,8 @@ namespace WebApplication1.Service.Impl
         /// <summary>
         /// 獲取所有的買入個股明細，並依據類型存入不同的資料
         /// </summary>
-        /// <param name="tables">HCNTD或HCNRH組成的List</param>
-        /// <returns>成功會回傳list，用來保存ProfitDetail</returns>
+        /// <param name="table">HCNTD或HCNRH的表</param>
+        /// <returns>成功會回傳ProfitDetail</returns>
         public ProfitDetail GetProfitDetail(dynamic table)
         {
             try
@@ -43,13 +45,7 @@ namespace WebApplication1.Service.Impl
 
                 decimal cost = table.COST ?? 0m;
                 decimal profitVal = table.COST ?? 0m;
-                decimal pl_ratio = 0m;
-
-                if (cost != 0m)
-                {
-                    pl_ratio = profitVal / cost * 100;
-                    pl_ratio = Math.Round(pl_ratio, 2);
-                }
+                decimal pl_ratio = _calc.plRatioCalc(profitVal, cost);
 
                 ProfitDetail profitDetail = new ProfitDetail()
                 {
@@ -92,7 +88,7 @@ namespace WebApplication1.Service.Impl
         /// 獲取所有的買入個股明細，並依據類型存入不同的資料
         /// </summary>
         /// <param name="table">HCNTD或HCNRH的表</param>
-        /// <returns>成功會回傳list，用來保存ProfitDetailOut</returns>
+        /// <returns>成功會回傳ProfitDetailOut</returns>
         public ProfitDetailOut GetProfitDetailOut(dynamic table)
         {
             try
@@ -106,13 +102,7 @@ namespace WebApplication1.Service.Impl
 
                 decimal cost = table.COST ?? 0m;
                 decimal profitVal = table.PROFIT ?? 0m;
-                decimal pl_ratio = 0m;
-
-                if (cost != 0m)
-                {
-                    pl_ratio = profitVal / cost * 100;
-                    pl_ratio = Math.Round(pl_ratio, 2);
-                }
+                decimal pl_ratio = _calc.plRatioCalc(profitVal, cost);
 
                 ProfitDetailOut profitDetailOut = new ProfitDetailOut()
                 {
@@ -149,9 +139,9 @@ namespace WebApplication1.Service.Impl
             }
 
         }
-        
+
         /// <summary>
-        /// 獲取所有的買入個股明細，並依據類型存入不同的資料
+        /// 獲取所有的買入個股明細，讓買入賣出一起處理，並依據交易日、委託書號、分單號作為依據進行分類
         /// </summary>
         /// <param name="tables">HCNTD或HCNRH組成的List</param>
         /// <returns>成功會回傳list，用來保存ProfitDetailOut</returns>
@@ -231,9 +221,7 @@ namespace WebApplication1.Service.Impl
                             bstype = "S",
                             wtype = g.FirstOrDefault()?.wtype,
                             profit = g.Sum(t => t.profit),
-                            pl_ratio = g.Sum(t => t.cost) != 0m
-                                ? $"{(g.Sum(t => t.profit) / g.Sum(t => t.cost) * 100m):F2}%"
-                                : "N/A",
+                            pl_ratio = _calc.plRatioCalc(g.Sum(t => t.profit).GetValueOrDefault(), g.Sum(t => t.cost).GetValueOrDefault()).ToString() + "%",
                             ctype = "0",
                             ttypename2 = g.FirstOrDefault()?.ttypename2,
                         };
@@ -259,6 +247,7 @@ namespace WebApplication1.Service.Impl
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
         public ProfitSum GetProfitSum(ProfitDetailSet detailSet, string bhno, string cseq)
         {
+            //用lin q group by把每筆給分組(?存起來
             try
             {
                 List<ProfitDetail> profitDetail = detailSet.profitDetails;
@@ -378,7 +367,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
         /// <param name="stockSymbol">股票代號</param>
-        /// <returns>回傳HCNrh加上CNAME組成的ExtendedHCNrh</returns>
+        /// <returns>回傳HCNRH加上CNAME組成的ExtendedHCNrh</returns>
         public async Task<List<ExtendedHCNRH>> GetHCNRHList(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             Logger.Log(1, "參數", $"獲取HCNRH table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");

@@ -16,14 +16,22 @@ namespace WebApplication1.Service.Impl
     {
         private readonly MyDbContext _context;
         private readonly ProfileSum _profileSum;
-        private readonly IRepository _repository;
+        private readonly IProfileRepository _repository;
+        private readonly Calc _calc;
 
-        public ProfileService(MyDbContext context, ProfileSum profileSum, IRepository repository)
+        public ProfileService(MyDbContext context, ProfileSum profileSum, IProfileRepository repository, Calc calc)
         {
             _context = context;
             _profileSum = profileSum;
             _repository = repository;
+            _calc = calc;
         }
+
+        /// <summary>
+        /// 獲取已實現損益-個股彙總資料
+        /// </summary>
+        /// <param name="list">存放所有profile的List</param>
+        /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
         public async Task<List<Profile>> GetProfileList(List<dynamic> tables)
         {
             List<Profile> list = new List<Profile>();
@@ -47,18 +55,14 @@ namespace WebApplication1.Service.Impl
                     string etype = table is ExtendedTMHIO ? table.ETYPE is "2" ? "1" : "0" : table.ETYPE;
                     decimal mprice = table.PRICE;
                     decimal mqty = table.QTY;
-                    decimal mamt = table is ExtendedTMHIO ? mprice * mqty : table.AMT;
+                    decimal mamt = table is ExtendedTMHIO ? _calc.mamtCalc(mprice, mqty) : table.AMT;
                     mamt = Math.Round(mamt);
-                    decimal fee = table is ExtendedTMHIO ? mprice * 0.001425m : table.AMT;
-                    if (fee < 20)
+                    decimal fee = table is ExtendedTMHIO ? bstype is "S" ? 0 : _calc.feeCalc(mprice, mqty) : table.AMT;
+                    if (table is ExtendedTMHIO && bstype is "S" && fee < 20)
                     {
                         fee = 20;
                     }
-                    else
-                    {
-                        fee = Math.Round(fee);
-                    }
-                    decimal tax = table is ExtendedTMHIO ? mprice * mqty * 0.003m : table.TAX;
+                    decimal tax = table is ExtendedTMHIO ? _calc.taxCalc(mprice, mqty) : table.TAX;
                     tax = Math.Round(tax);
                     decimal netamt = table is ExtendedTMHIO ? ttype is "B" ? -(mamt + fee) : mamt - fee - tax : table.NETAMT;
 
@@ -125,6 +129,12 @@ namespace WebApplication1.Service.Impl
                 return null;
             }
         }
+
+        /// <summary>
+        /// 獲取對帳單匯總資料，依據買還是賣分別處理資料
+        /// </summary>
+        /// <param name="list">存放所有profile的List</param>
+        /// <returns>成功會回傳所有資料加總後BillSum</returns>
         public async Task<BillSum> GetBillSum(List<Profile> list)
         {
             try
@@ -132,31 +142,24 @@ namespace WebApplication1.Service.Impl
                 var buyList = list.Where(t => t.bstype == "B").ToList();
                 var sellList = list.Where(t => t.bstype == "S").ToList();
 
-                // 計算買入金額總和
                 decimal cnbamt = buyList.Sum(t => t.mamt);
                 Logger.Log(1, "資訊", $"買入金額總和 (cnbamt): {string.Join(", ", buyList.Select(t => $"mamt: {t.mamt}"))} -> 總和: {cnbamt}");
 
-                // 計算賣出金額總和
                 decimal cnsamt = sellList.Sum(t => t.mamt);
                 Logger.Log(1, "資訊", $"賣出金額總和 (cnsamt): {string.Join(", ", sellList.Select(t => $"mamt: {t.mamt}"))} -> 總和: {cnsamt}");
 
-                // 計算手續費總和
                 decimal cnfee = list.Sum(t => t.fee);
                 Logger.Log(1, "資訊", $"手續費總和 (cnfee): {string.Join(", ", list.Select(t => $"fee: {t.fee}"))} -> 總和: {cnfee}");
 
-                // 計算稅金總和
                 decimal cntax = list.Sum(t => t.tax);
                 Logger.Log(1, "資訊", $"稅金總和 (cntax): {string.Join(", ", list.Select(t => $"tax: {t.tax}"))} -> 總和: {cntax}");
 
-                // 計算淨金額總和
                 decimal cnnetamt = list.Sum(t => t.netamt);
                 Logger.Log(1, "資訊", $"淨金額總和 (cnnetamt): {string.Join(", ", list.Select(t => $"netamt: {t.netamt}"))} -> 總和: {cnnetamt}");
 
-                // 計算買入數量總和
                 decimal bqty = buyList.Sum(t => t.mqty);
                 Logger.Log(1, "資訊", $"買入數量總和 (bqty): {string.Join(", ", buyList.Select(t => $"mqty: {t.mqty}"))} -> 總和: {bqty}");
 
-                // 計算賣出數量總和
                 decimal sqty = sellList.Sum(t => t.mqty);
                 Logger.Log(1, "資訊", $"賣出數量總和 (sqty): {string.Join(", ", sellList.Select(t => $"mqty: {t.mqty}"))} -> 總和: {sqty}");
 
@@ -178,6 +181,13 @@ namespace WebApplication1.Service.Impl
                 return null;
             }
         }
+
+        /// <summary>
+        /// 獲取對帳單 - 彙總資料，
+        /// </summary>
+        /// <param name="bill">BillSum資料</param>
+        /// <param name="list">存放所有profile的List</param>
+        /// <returns>成功會回傳所有加總後BillSum</returns>
         public async Task<ProfileSum> GetProfileSum(BillSum bill, List<Profile> list)
         {
             try
@@ -211,6 +221,13 @@ namespace WebApplication1.Service.Impl
                 return null;
             }
         }
+
+        /// <summary>
+        /// 生成對帳單 - 彙總的錯誤訊息
+        /// </summary>
+        /// <param name="errcode">錯誤碼</param>
+        /// <param name="errmsg">錯誤訊息</param>
+        /// <returns>成功會回傳profile_sum，用來保存帳號匯總</returns>
         public async Task<ProfileSum> GetProfileSumFailed(string errcode, string errmsg)
         {
             ProfileSum profileSum = new ProfileSum()
@@ -221,6 +238,16 @@ namespace WebApplication1.Service.Impl
 
             return profileSum;
         }
+
+        /// <summary>
+        /// 獲取特定分公司特定帳號的當日交易明細，只有當日日期有包含在內才做查詢
+        /// </summary>
+        /// <param name="bhno">分公司</param>
+        /// <param name="cseq">帳號</param>
+        /// <param name="sdate">開始日</param>
+        /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代號</param>
+        /// <returns>回傳TMHIO加上CNAME組成的ExtendedTMHIO</returns>
         public async Task<List<ExtendedTMHIO>> GetTMHIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             Logger.Log(1, "參數", $"獲取HCNTD table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
@@ -272,6 +299,16 @@ namespace WebApplication1.Service.Impl
                 return null;
             }
         }
+
+        /// <summary>
+        /// 獲取特定分公司特定帳號的當日交易明細，只有當日日期有包含在內才做查詢
+        /// </summary>
+        /// <param name="bhno">分公司</param>
+        /// <param name="cseq">帳號</param>
+        /// <param name="sdate">開始日</param>
+        /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代號</param>
+        /// <returns>回傳HCMIO加上CNAME組成的ExtendedHCMIO</returns>
         public async Task<List<ExtendedHCMIO>> GetHCMIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             Logger.Log(1, "參數", $"獲取HCNTD table - bhno{bhno}, cseq{cseq}, sdate{sdate}, edate{edate}");
