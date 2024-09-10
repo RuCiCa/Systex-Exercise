@@ -7,11 +7,12 @@ namespace WebApplication1.Service.Api
 {
     public interface IProfileService
     {
-        Task<List<Profile>> GetProfileList(List<dynamic> list);
-        Task<BillSum> GetBillSum(List<Profile> list);
-        Task<ProfileSum> GetProfileSum(BillSum bill, List<Profile> list);
-        Task<ProfileSum> GetProfileSumFailed(string errcode, string errmsg);
-        Task<List<ExtendedTMHIO>> GetTMHIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
-        Task<List<ExtendedHCMIO>> GetHCMIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
+        List<Profile> GetProfileList(List<dynamic> list);
+        BillSum GetBillSum(List<Profile> list);
+        ProfileSum GetProfileSum(BillSum bill, List<Profile> list);
+        ProfileSum GetProfileSumFailed(string errcode, string errmsg);
+        List<ExtendedTMHIO> GetTMHIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
+        List<ExtendedHCMIO> GetHCMIOList(string bhno, string cseq, string sdate, string edate, string stockSymbol);
+        Task<ProfileSum> GetProfileService(string bhno, string cseq, string sdate, string Edate, string stockSymbol);
     }
 }

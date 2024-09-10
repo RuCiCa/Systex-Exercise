@@ -9,6 +9,7 @@ using static System.Runtime.CompilerServices.RuntimeHelpers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics.Eventing.Reader;
 using static System.Net.Mime.MediaTypeNames;
+using Azure.Core;
 
 namespace WebApplication1.Service.Impl
 {
@@ -32,7 +33,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">存放所有profile的List</param>
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public async Task<List<Profile>> GetProfileList(List<dynamic> tables)
+        public List<Profile> GetProfileList(List<dynamic> tables)
         {
             List<Profile> list = new List<Profile>();
             try
@@ -135,7 +136,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">存放所有profile的List</param>
         /// <returns>成功會回傳所有資料加總後BillSum</returns>
-        public async Task<BillSum> GetBillSum(List<Profile> list)
+        public BillSum GetBillSum(List<Profile> list)
         {
             try
             {
@@ -188,7 +189,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="bill">BillSum資料</param>
         /// <param name="list">存放所有profile的List</param>
         /// <returns>成功會回傳所有加總後BillSum</returns>
-        public async Task<ProfileSum> GetProfileSum(BillSum bill, List<Profile> list)
+        public ProfileSum GetProfileSum(BillSum bill, List<Profile> list)
         {
             try
             {
@@ -228,7 +229,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="errcode">錯誤碼</param>
         /// <param name="errmsg">錯誤訊息</param>
         /// <returns>成功會回傳profile_sum，用來保存帳號匯總</returns>
-        public async Task<ProfileSum> GetProfileSumFailed(string errcode, string errmsg)
+        public ProfileSum GetProfileSumFailed(string errcode, string errmsg)
         {
             ProfileSum profileSum = new ProfileSum()
             {
@@ -295,7 +296,7 @@ namespace WebApplication1.Service.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log(4, "錯誤", $"獲取特定分公司特定帳號在時間範圍內的歷史現股當沖失敗, 錯誤訊息: {ex.Message}");
+                Logger.Log(4, "錯誤", $"獲取特定分公司https://www.youtube.com/特定帳號在時間範圍內的歷史現股當沖失敗, 錯誤訊息: {ex.Message}");
                 return null;
             }
         }
@@ -370,6 +371,83 @@ namespace WebApplication1.Service.Impl
             {
                 Logger.Log(4, "錯誤", $"獲取特定分公司特定帳號在時間範圍內的歷史現股當沖失敗, 錯誤訊息: {ex.Message}");
                 return null;
+            }
+        }
+
+        public async Task<ProfileSum> GetProfileService(string bhno, string cseq, string sdate, string Edate, string stockSymbol)
+        {
+            try
+            {
+                Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
+                List<ExtendedTMHIO> TMHIOList = await GetTMHIOList(bhno, cseq, sdate, Edate, stockSymbol);
+                List<ExtendedHCMIO> HCMIOList = await GetHCMIOList(bhno, cseq, sdate, Edate, stockSymbol);
+
+                Logger.Log(1, "參數", $"TMHIO有{TMHIOList.Count()}筆、HCMIO有{HCMIOList.Count()}筆");
+                List<Profile> profileList = new List<Profile>();
+                BillSum billSum = new BillSum();
+                ProfileSum profileSum = new ProfileSum();
+
+                switch ((TMHIOList.Count() > 0, HCMIOList.Count() > 0))
+                {
+                    case (true, true):
+                        {
+                            List<Profile> TMHIOProfileList = GetProfileList(TMHIOList.Cast<dynamic>().ToList());
+                            if (TMHIOProfileList is null)
+                            {
+                                return GetProfileSumFailed("500", $"獲取TMHIO對帳單 - 明細時出現錯誤");
+                            }
+                            List<Profile> HCMIOProfileList = GetProfileList(HCMIOList.Cast<dynamic>().ToList());
+                            if (HCMIOProfileList is null)
+                            {
+                                return GetProfileSumFailed("500", $"獲取HCMIO對帳單 - 明細時出現錯誤");
+                            }
+                            profileList = TMHIOProfileList.Concat(HCMIOProfileList).ToList();
+                            break;
+                        }
+                    case (true, false):
+                        {
+                            profileList = GetProfileList(TMHIOList.Cast<dynamic>().ToList());
+                            if (profileList is null)
+                            {
+                                return GetProfileSumFailed("500", $"TMHIO獲取對帳單 - 明細時出現錯誤");
+                            }
+                            break;
+                        }
+                    case (false, true):
+                        {
+                            profileList = GetProfileList(HCMIOList.Cast<dynamic>().ToList());
+                            if (profileList is null)
+                            {
+                                return GetProfileSumFailed("500", $"獲取HCMIO對帳單 - 明細時出現錯誤");
+                            }
+                            break;
+                        }
+                    case (false, false):
+                        {
+                            Logger.Log(3, "錯誤", $"未找到分公司{bhno}帳號{cseq}在{sdate}到{Edate}這段期間的交易紀錄");
+                            return GetProfileSumFailed("404", $"未找到分公司{bhno}帳號{cseq}在{sdate}到{Edate}這段期間的交易");
+                        }
+                }
+
+                billSum = GetBillSum(profileList);
+                if (billSum is null)
+                {
+                    return GetProfileSumFailed("500", $"獲取對帳單匯總資料時出現錯誤");
+                }
+
+                profileSum = GetProfileSum(billSum, profileList);
+                if (profileSum is null)
+                {
+                    return GetProfileSumFailed("500", $"獲取對帳單 - 彙總資料時出現錯誤");
+                }
+
+                var response = profileSum;
+                return response;
+            }
+            catch
+            {
+                var response = GetProfileSumFailed("500", "Internal Server Error");
+                return response;
             }
         }
     }

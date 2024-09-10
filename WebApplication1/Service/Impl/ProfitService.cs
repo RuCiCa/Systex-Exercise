@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Net;
@@ -145,7 +146,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="tables">HCNTD或HCNRH組成的List</param>
         /// <returns>成功會回傳list，用來保存ProfitDetailOut</returns>
-        public async Task<List<ProfitDetailSet>> GetProfitDetailSets(List<dynamic> tables)
+        public List<ProfitDetailSet> GetProfitDetailSets(List<dynamic> tables)
         {
             List<ProfitDetailSet> list = new List<ProfitDetailSet>();
 
@@ -168,7 +169,7 @@ namespace WebApplication1.Service.Impl
                     existingSet.profitDetails.Add(profitDetail);
 
                     List<ProfitDetailOut> combinedOuts = new List<ProfitDetailOut> { existingSet.profitDetailOut, profitDetailOut };
-                    var mergedOuts = await SumProfitDetailOut(combinedOuts);
+                    var mergedOuts = SumProfitDetailOut(combinedOuts);
                     existingSet.profitDetailOut = mergedOuts.FirstOrDefault();
                 }
                 else
@@ -190,7 +191,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">存放所有ProfitDetailOut的List</param>
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public async Task<List<ProfitDetailOut>> SumProfitDetailOut(List<ProfitDetailOut> list)
+        public List<ProfitDetailOut> SumProfitDetailOut(List<ProfitDetailOut> list)
         {
             var groupedProfitDetails = list
                 .GroupBy(t => new { t.tdate, t.dseq, t.dno })
@@ -427,7 +428,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="cseq">帳號</param>\
         /// <param name="profitDetailSets">存放所有的ProfitDetail的List跟ProfitDetailOut的變數</param>
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public async Task<List<ProfitSum>> GetProfitSumList(string bhno, string cseq, List<ProfitDetailSet> profitDetailSets)
+        public List<ProfitSum> GetProfitSumList(string bhno, string cseq, List<ProfitDetailSet> profitDetailSets)
         {
             List<ProfitSum> profitSumList = new List<ProfitSum>();
 
@@ -449,7 +450,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">存放所有ProfitSum的List</param>
         /// <returns>成功會回傳已實現損益的帳號匯總/// </returns>
-        public async Task<ProfitAccsum> GetProfittAccsum(List<ProfitSum> list)
+        public ProfitAccsum GetProfittAccsum(List<ProfitSum> list)
         {
             try
             {
@@ -491,7 +492,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="errcode">錯誤碼</param>
         /// <param name="errmsg">錯誤訊息</param>
         /// <returns>成功會回傳unoffset_qtype_accsum，用來保存帳號匯總</returns>
-        public async Task<ProfitAccsum> GetProfittAccsumFailed(string errcode, string errmsg)
+        public ProfitAccsum GetProfittAccsumFailed(string errcode, string errmsg)
         {
             ProfitAccsum profitAccsum = new ProfitAccsum()
             {
@@ -500,6 +501,67 @@ namespace WebApplication1.Service.Impl
             };
 
             return profitAccsum;
+        }
+
+        public async Task<ProfitAccsum> GetProfitService(string bhno, string cseq, string sdate, string Edate, string stockSymbol)
+        {
+            try
+            {
+
+                Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
+                List<ExtendedHCNTD> HCNTDList = await GetHCNTDList(bhno, cseq, sdate, Edate, stockSymbol);
+                List<ExtendedHCNRH> HCNRHList = await GetHCNRHList(bhno, cseq, sdate, Edate, stockSymbol);
+
+                Logger.Log(1, "參數", $"HCNTD有{HCNTDList.Count()}筆、HCNRH有{HCNRHList.Count()}筆");
+                List<ProfitDetailOut> profitDetailOuts = new List<ProfitDetailOut>();
+                List<ProfitDetail> profitDetails = new List<ProfitDetail>();
+                List<ProfitSum> profitSumList = new List<ProfitSum>();
+
+                switch ((HCNTDList.Count() > 0, HCNRHList.Count() > 0))
+                {
+                    case (true, true):
+                        {
+                            List<ProfitDetailSet> HCNTDSet = GetProfitDetailSets(HCNTDList.Cast<dynamic>().ToList());
+                            List<ProfitDetailSet> HCNRHSet = GetProfitDetailSets(HCNRHList.Cast<dynamic>().ToList());
+                            List<ProfitSum> HCNTDSum = GetProfitSumList(bhno, cseq, HCNTDSet);
+                            List<ProfitSum> HCNRHSum = GetProfitSumList(bhno, cseq, HCNRHSet);
+                            profitSumList = HCNRHSum.Concat(HCNTDSum).ToList();
+
+                            break;
+                        }
+                    case (true, false):
+                        {
+                            List<ProfitDetailSet> SetList = GetProfitDetailSets(HCNTDList.Cast<dynamic>().ToList());
+                            profitSumList = GetProfitSumList(bhno, cseq, SetList);
+                            break;
+                        }
+                    case (false, true):
+                        {
+                            List<ProfitDetailSet> SetList = GetProfitDetailSets(HCNRHList.Cast<dynamic>().ToList());
+                            profitSumList = GetProfitSumList(bhno, cseq, SetList);
+                            break;
+                        }
+                    case (false, false):
+                        {
+                            Logger.Log(3, "錯誤", $"未找到分公司{bhno}帳號{cseq}在{sdate} 到 {Edate}這段期間的交易紀錄");
+                            return GetProfittAccsumFailed("404", $"未找到分公司{bhno}帳號{cseq}在{sdate} 到 {Edate}這段期間的交易");
+                        }
+                }
+
+                var response = GetProfittAccsum(profitSumList);
+                if (response is null)
+                {
+                    return GetProfittAccsumFailed("500", $"獲取國內證券 已實現損益 帳戶彙總資料時出現錯誤");
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"搜尋{bhno}帳號{cseq}的交易紀錄時出現了錯誤：{ex}");
+                var response = GetProfittAccsumFailed("500", "Internal Server Error");
+                return response;
+            }
         }
     }
 }

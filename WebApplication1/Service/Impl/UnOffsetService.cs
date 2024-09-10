@@ -1,3 +1,4 @@
+using Azure.Core;
 using System.Collections.Generic;
 using System.ComponentModel;
 using WebApplication1.Common;
@@ -132,7 +133,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
         /// <returns>成功會回傳unOffsetDetailList，用來保存unOffsetDetail</returns>
-        public async Task<List<UnOffsetDetail>> GetUnOffsetDetailList(List<UnOffset> list)
+        public List<UnOffsetDetail> GetUnOffsetDetailList(List<UnOffset> list)
         {
             //建立一個dict，然後使用StringArrayComparer來對作為key的string[]檢查
             var unOffsetDetailList = new List<UnOffsetDetail>();
@@ -240,7 +241,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">所有的個股明細</param>
         /// <returns>成功會回傳unOffsetSumList，用來保存所有的個股未實現損益</returns>
-        public async Task<List<UnOffsetSum>> GetUnOffsetSumList(List<UnOffsetDetail> list)
+        public List<UnOffsetSum> GetUnOffsetSumList(List<UnOffsetDetail> list)
         {
             List<UnOffsetSum> unOffsetSums = new List<UnOffsetSum>();
             var groupedUnOffsets = list.GroupBy(u => new { u.stock, u.stocknm });
@@ -273,7 +274,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">所有的個股未實現損益</param>
         /// <returns>成功會回傳unoffset_qtype_accsum，用來保存帳號匯總</returns>
-        public async Task<UnOffsetAccsum> GetUnOffsetAccsum(List<UnOffsetSum> list)
+        public UnOffsetAccsum GetUnOffsetAccsum(List<UnOffsetSum> list)
         {
             Logger.Log(0, "開始", $"開始獲取國內證券-未實現損益 帳號彙總");
             UnOffsetAccsum unoffset_qtype_accsum = new UnOffsetAccsum();
@@ -354,7 +355,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="errcode">錯誤碼</param>
         /// <param name="errmsg">錯誤訊息</param>
         /// <returns>成功會回傳unoffset_qtype_accsum，用來保存帳號匯總</returns>
-        public async Task<UnOffsetAccsum> GetFailedUnOffsetAccsum(string errcode, string errmsg)
+        public UnOffsetAccsum GetFailedUnOffsetAccsum(string errcode, string errmsg)
         {
             UnOffsetAccsum unoffset_qtype_accsum = new UnOffsetAccsum();
 
@@ -363,6 +364,39 @@ namespace WebApplication1.Service.Impl
             unoffset_qtype_accsum.unoffset_qtype_sum = [];
 
             return unoffset_qtype_accsum;
+        }
+
+        public async Task<UnOffsetAccsum> GetUnOffsetService(string bhno, string cseq, string stockSymbol)
+        {
+            try
+            {
+                //資料庫內尋找所有的交易紀錄，如果沒找到任何紀錄就會回傳404 Not Found
+                Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
+                var UnOffsetList = await GetUnOffsetList(bhno, cseq, stockSymbol);
+                var UnOffsetDetailList = GetUnOffsetDetailList(UnOffsetList);
+                if (UnOffsetDetailList == null)
+                {
+                    return GetFailedUnOffsetAccsum("404", "未實現損益 – 個股明細獲取失敗");
+                }
+                if (UnOffsetDetailList.Count == 0)
+                {
+                    return GetFailedUnOffsetAccsum("404", $"未找到{bhno}帳號{cseq}的交易紀錄");
+                }
+                var UnOffsetSumList = GetUnOffsetSumList(UnOffsetDetailList);
+                if (UnOffsetSumList == null)
+                {
+                    return GetFailedUnOffsetAccsum("404", "個股未實現損益獲取失敗");
+                }
+                var response = GetUnOffsetAccsum(UnOffsetSumList);
+                return response;
+            }
+            //過程中未防呆的部分都會抓到這邊
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"搜尋{bhno}帳號{cseq}的交易紀錄時出現了錯誤：{ex}");
+                var response = GetFailedUnOffsetAccsum("500", "Internal Server Error");
+                return response;
+            }
         }
     }
 }
