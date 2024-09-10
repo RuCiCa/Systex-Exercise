@@ -8,10 +8,8 @@ namespace WebApplication1.Service.Api
     {
         ProfitDetail GetProfitDetail(dynamic table);
         ProfitDetailOut GetProfitDetailOut(dynamic table);
-        ProfitSum GetProfitSum(ProfitDetailSet profitDetailSet, string bhno, string cseq);
-        List<ProfitDetailOut> SumProfitDetailOut(List<ProfitDetailOut> list);
-        List<ProfitDetailSet> GetProfitDetailSets(List<dynamic> tables);
-        List<ProfitSum> GetProfitSumList(string bhno, string cseq, List<ProfitDetailSet> profitDetailSets);
+        ProfitSum GetProfitSum(List<ProfitDetail> profitDetail, ProfitDetailOut profitDetailOut, string bhno, string cseq);
+        List<ProfitSum> GetProfitSumList(List<dynamic> tables, string bhno, string cseq);
         ProfitAccsum GetProfittAccsum(List<ProfitSum> list);
         ProfitAccsum GetProfittAccsumFailed(string errorcode, string errormsg);
         Task<List<ExtendedHCNTD>> GetHCNTDList(string bhno, string cseq, string sdate, string edate, string stockSymbol);

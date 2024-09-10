@@ -146,43 +146,47 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="tables">HCNTD或HCNRH組成的List</param>
         /// <returns>成功會回傳list，用來保存ProfitDetailOut</returns>
-        public List<ProfitDetailSet> GetProfitDetailSets(List<dynamic> tables)
+        public List<ProfitSum> GetProfitSumList(List<dynamic> tables, string bhno, string cseq)
         {
-            List<ProfitDetailSet> list = new List<ProfitDetailSet>();
-
-            foreach (dynamic table in tables)
+            // 使用 GroupBy 將表格依據 TDATE, SDSEQ 和 SDNO 分組
+            var groupedTables = tables.GroupBy(table => new
             {
-                string tdate = table.TDATE ?? string.Empty;
-                string dseq = table.SDSEQ ?? string.Empty;
-                string dno = table.SDNO ?? string.Empty;
+                Tdate = table.TDATE ?? string.Empty,
+                Dseq = table.SDSEQ ?? string.Empty,
+                Dno = table.SDNO ?? string.Empty
+            });
 
-                ProfitDetail profitDetail = GetProfitDetail(table);
-                ProfitDetailOut profitDetailOut = GetProfitDetailOut(table);
+            List<ProfitSum> list = new List<ProfitSum>();
 
-                var existingSet = list.FirstOrDefault(p =>
-                    p.profitDetailOut.tdate == tdate &&
-                    p.profitDetailOut.dseq == dseq &&
-                    p.profitDetailOut.dno == dno);
+            foreach (var group in groupedTables)
+            {
+                // 取得分組的關鍵值
+                string tdate = group.Key.Tdate;
+                string dseq = group.Key.Dseq;
+                string dno = group.Key.Dno;
 
-                if (existingSet != null)
+                // 針對每個群組建立 ProfitDetailSet
+                List<ProfitDetail> profitDetails = new List<ProfitDetail>();
+
+                List<ProfitDetailOut> combinedOuts = new List<ProfitDetailOut>();
+
+                foreach (var table in group)
                 {
-                    existingSet.profitDetails.Add(profitDetail);
+                    // 處理 ProfitDetail 和 ProfitDetailOut
+                    ProfitDetail profitDetail = GetProfitDetail(table);
+                    ProfitDetailOut profitDetailOut = GetProfitDetailOut(table);
+                    // 將每個群組的 profitDetail 加入到 list
+                    profitDetails.Add(profitDetail);
+                    combinedOuts.Add(profitDetailOut);
+                }
+                // 合併 ProfitDetailOut 的資料
+                var mergedOuts = SumProfitDetailOut(combinedOuts);
+                ProfitSum profitSum = GetProfitSum(profitDetails, mergedOuts, bhno, cseq);
 
-                    List<ProfitDetailOut> combinedOuts = new List<ProfitDetailOut> { existingSet.profitDetailOut, profitDetailOut };
-                    var mergedOuts = SumProfitDetailOut(combinedOuts);
-                    existingSet.profitDetailOut = mergedOuts.FirstOrDefault();
-                }
-                else
-                {
-                    ProfitDetailSet newSet = new ProfitDetailSet
-                    {
-                        profitDetails = new List<ProfitDetail> { profitDetail },
-                        profitDetailOut = profitDetailOut
-                    };
-                    list.Add(newSet);
-                }
+                // 將新的 ProfitDetailSet 加入到結果列表中
+                list.Add(profitSum);
             }
-
+            
             return list;
         }
 
@@ -190,52 +194,48 @@ namespace WebApplication1.Service.Impl
         /// 將TDATE、SDSEQ、SDNO相同的ProfitDetailOut加總
         /// </summary>
         /// <param name="list">存放所有ProfitDetailOut的List</param>
-        /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public List<ProfitDetailOut> SumProfitDetailOut(List<ProfitDetailOut> list)
+        /// <returns>成功會回傳加總後的ProfitDetailOut</returns>
+        public ProfitDetailOut SumProfitDetailOut(List<ProfitDetailOut> list)
         {
-            var groupedProfitDetails = list
-                .GroupBy(t => new { t.tdate, t.dseq, t.dno })
-                .Select(g =>
+            try
+            {
+                // 假設所有的 ProfitDetailOut 都具有相同的 TDATE、SDSEQ 和 SDNO
+                var firstItem = list.FirstOrDefault();
+                if (firstItem == null) return null;
+
+                Logger.Log(1, "參數", $"加總已實現損益 - 個股明細資料 (賣出) - 處理日期: {firstItem.tdate}, 委託書號: {firstItem.dseq}, 分單號: {firstItem.dno}");
+
+                return new ProfitDetailOut
                 {
-                    try
-                    {
-                        Logger.Log(1, "參數", $"加總已實現損益 - 個股明細資料 (賣出) - 處理日期: {g.Key.tdate}, 委託書號: {g.Key.dseq}, 分單號: {g.Key.dno}");
-
-                        return new ProfitDetailOut
-                        {
-                            stock = g.FirstOrDefault()?.stock,
-                            stocknm = g.FirstOrDefault()?.stocknm,
-                            tdate = g.Key.tdate,
-                            dseq = g.Key.dseq,
-                            dno = g.Key.dno,
-                            mqty = g.Sum(t => t.mqty),
-                            cqty = g.Sum(t => t.cqty),
-                            mprice = g.FirstOrDefault()?.mprice,
-                            mamt = g.Sum(t => decimal.Parse(t.mamt)).ToString(),
-                            cost = g.Sum(t => t.cost),
-                            income = g.Sum(t => t.income),
-                            netamt = g.Sum(t => t.netamt),
-                            fee = g.Sum(t => t.fee),
-                            tax = g.Sum(t => t.tax),
-                            ttype = "0",
-                            ttypename = "現股",
-                            bstype = "S",
-                            wtype = g.FirstOrDefault()?.wtype,
-                            profit = g.Sum(t => t.profit),
-                            pl_ratio = _calc.plRatioCalc(g.Sum(t => t.profit).GetValueOrDefault(), g.Sum(t => t.cost).GetValueOrDefault()).ToString() + "%",
-                            ctype = "0",
-                            ttypename2 = g.FirstOrDefault()?.ttypename2,
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(4, "錯誤", $"處理日期: {g.Key.tdate}, 委託書號: {g.Key.dseq}, 分單號: {g.Key.dno}, 加總失敗, 錯誤訊息: {ex.Message}");
-                        return null;
-                    }
-                })
-                .ToList();
-
-            return groupedProfitDetails;
+                    stock = firstItem.stock,
+                    stocknm = firstItem.stocknm,
+                    tdate = firstItem.tdate,
+                    dseq = firstItem.dseq,
+                    dno = firstItem.dno,
+                    mqty = list.Sum(t => t.mqty),
+                    cqty = list.Sum(t => t.cqty),
+                    mprice = firstItem.mprice,
+                    mamt = list.Sum(t => decimal.Parse(t.mamt)).ToString(),
+                    cost = list.Sum(t => t.cost),
+                    income = list.Sum(t => t.income),
+                    netamt = list.Sum(t => t.netamt),
+                    fee = list.Sum(t => t.fee),
+                    tax = list.Sum(t => t.tax),
+                    ttype = "0",
+                    ttypename = "現股",
+                    bstype = "S",
+                    wtype = firstItem.wtype,
+                    profit = list.Sum(t => t.profit),
+                    pl_ratio = _calc.plRatioCalc(list.Sum(t => t.profit).GetValueOrDefault(), list.Sum(t => t.cost).GetValueOrDefault()).ToString() + "%",
+                    ctype = "0",
+                    ttypename2 = firstItem.ttypename2,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"處理日期: {list.FirstOrDefault()?.tdate}, 委託書號: {list.FirstOrDefault()?.dseq}, 分單號: {list.FirstOrDefault()?.dno}, 加總失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>
@@ -246,14 +246,11 @@ namespace WebApplication1.Service.Impl
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public ProfitSum GetProfitSum(ProfitDetailSet detailSet, string bhno, string cseq)
+        public ProfitSum GetProfitSum(List<ProfitDetail> profitDetail, ProfitDetailOut profitDetailOut, string bhno, string cseq)
         {
             //用lin q group by把每筆給分組(?存起來
             try
             {
-                List<ProfitDetail> profitDetail = detailSet.profitDetails;
-                ProfitDetailOut profitDetailOut = detailSet.profitDetailOut;
-
                 string tdate = profitDetailOut.tdate;
                 string dseq = profitDetailOut.dseq;
                 string dno = profitDetailOut.dno;
@@ -421,29 +418,6 @@ namespace WebApplication1.Service.Impl
             }
         }
 
-        /// <summary>
-        /// 將所有profitDetailOut依照股票一一取出並進行加總
-        /// </summary>
-        /// <param name="bhno">分公司</param>
-        /// <param name="cseq">帳號</param>\
-        /// <param name="profitDetailSets">存放所有的ProfitDetail的List跟ProfitDetailOut的變數</param>
-        /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
-        public List<ProfitSum> GetProfitSumList(string bhno, string cseq, List<ProfitDetailSet> profitDetailSets)
-        {
-            List<ProfitSum> profitSumList = new List<ProfitSum>();
-
-            foreach (var profitDetailSet in profitDetailSets)
-            {
-                var profitSum = GetProfitSum(profitDetailSet, bhno, cseq);
-                if (profitSum is null)
-                {
-                    return null;
-                }
-                profitSumList.Add(profitSum);
-            }
-
-            return profitSumList;
-        }
 
         /// <summary>
         /// 將所有的profitSum進行加總
@@ -521,24 +495,20 @@ namespace WebApplication1.Service.Impl
                 {
                     case (true, true):
                         {
-                            List<ProfitDetailSet> HCNTDSet = GetProfitDetailSets(HCNTDList.Cast<dynamic>().ToList());
-                            List<ProfitDetailSet> HCNRHSet = GetProfitDetailSets(HCNRHList.Cast<dynamic>().ToList());
-                            List<ProfitSum> HCNTDSum = GetProfitSumList(bhno, cseq, HCNTDSet);
-                            List<ProfitSum> HCNRHSum = GetProfitSumList(bhno, cseq, HCNRHSet);
+                            List<ProfitSum> HCNTDSum = GetProfitSumList(HCNTDList.Cast<dynamic>().ToList(), bhno, cseq);
+                            List<ProfitSum> HCNRHSum = GetProfitSumList(HCNRHList.Cast<dynamic>().ToList(), bhno, cseq);
                             profitSumList = HCNRHSum.Concat(HCNTDSum).ToList();
 
                             break;
                         }
                     case (true, false):
                         {
-                            List<ProfitDetailSet> SetList = GetProfitDetailSets(HCNTDList.Cast<dynamic>().ToList());
-                            profitSumList = GetProfitSumList(bhno, cseq, SetList);
+                            profitSumList = GetProfitSumList(HCNTDList.Cast<dynamic>().ToList(), bhno, cseq);
                             break;
                         }
                     case (false, true):
                         {
-                            List<ProfitDetailSet> SetList = GetProfitDetailSets(HCNRHList.Cast<dynamic>().ToList());
-                            profitSumList = GetProfitSumList(bhno, cseq, SetList);
+                            profitSumList = GetProfitSumList(HCNRHList.Cast<dynamic>().ToList(), bhno, cseq);
                             break;
                         }
                     case (false, false):
