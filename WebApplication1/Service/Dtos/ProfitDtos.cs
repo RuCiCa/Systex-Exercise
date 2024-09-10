@@ -77,9 +77,4 @@ namespace WebApplication1.Service.Dtos
         public decimal? tax { get; set; }
         public List<ProfitSum> profit_sum { get; set; }
     }
-    public class ProfitDetailSet
-    {
-        public List<ProfitDetail> profitDetails { get; set; }
-        public ProfitDetailOut profitDetailOut { get; set; }
-    }
 }
