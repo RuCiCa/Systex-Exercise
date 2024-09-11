@@ -31,15 +31,18 @@ builder.Services.AddSwaggerGen();
 // 在 Autofac 容器中註冊服務
 builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
 {
-    containerBuilder.RegisterType<Repository>().As<IRepository>().InstancePerLifetimeScope();
+
     containerBuilder.RegisterType<ErrorService>().As<IErrorService>().InstancePerLifetimeScope();
 
+    containerBuilder.RegisterType<UnOffsetRepository>().As<IUnOffsetRepository>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<UnOffsetAccsum>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<UnOffsetService>().As<IUnOffsetService>().InstancePerLifetimeScope();
 
+    containerBuilder.RegisterType<ProfitRepository>().As<IProfitRepository>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<ProfitAccsum>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<ProfitService>().As<IProfitService>().InstancePerLifetimeScope();
 
+    containerBuilder.RegisterType<ProfileRepository>().As<IProfileRepository>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<ProfileSum>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<ProfileService>().As<IProfileService>().InstancePerLifetimeScope();
 });
