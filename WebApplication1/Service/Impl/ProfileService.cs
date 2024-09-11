@@ -61,7 +61,14 @@ namespace WebApplication1.Service.Impl
                     decimal fee = table is ExtendedTMHIO ? bstype is "S" ? 0 : _calc.feeCalc(mprice, mqty) : table.AMT;
                     if (table is ExtendedTMHIO && bstype is "S" && fee < 20)
                     {
-                        fee = 20;
+                        if (fee < 1 && etype is "1")
+                        {
+                            fee = 1;
+                        }
+                        else
+                        {
+                            fee = 20;
+                        }
                     }
                     decimal tax = table is ExtendedTMHIO ? _calc.taxCalc(mprice, mqty) : table.TAX;
                     tax = Math.Round(tax);
