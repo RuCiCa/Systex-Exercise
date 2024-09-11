@@ -1,1 +1,7 @@
-﻿.vs/
+﻿*.log 
+test.txt
+/.vs
+/WebApplication1/bin
+/WebApplication1/obj
+/TestProject1/bin
+/TestProject1/obj
