@@ -5,6 +5,7 @@
         public string qtype { get; set; }
         public string BHNO { get; set; }
         public string CSEQ { get; set; }
+        public string stockSymbol { get; set; }
         public string sdate { get; set; }
         public string Edate { get; set; }
     }

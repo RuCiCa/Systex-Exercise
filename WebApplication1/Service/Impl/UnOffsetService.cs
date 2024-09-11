@@ -1,3 +1,4 @@
+using Azure.Core;
 using System.Collections.Generic;
 using System.ComponentModel;
 using WebApplication1.Common;
@@ -10,13 +11,41 @@ namespace WebApplication1.Service.Impl
     public class UnOffsetService : IUnOffsetService
     {
         private readonly UnOffsetAccsum _unOffsetAccsum;
-        private readonly IRepository _repository;
+        private readonly IUnOffsetRepository _repository;
+        private readonly Calc _calc;
 
-
-        public UnOffsetService(UnOffsetAccsum unOffsetAccsum, IRepository repository)
+        public UnOffsetService(UnOffsetAccsum unOffsetAccsum, IUnOffsetRepository repository, Calc calc)
         {
+            _calc = calc;
             _unOffsetAccsum = unOffsetAccsum;
             _repository = repository;
+        }
+
+        public async Task<List<UnOffset>> GetUnOffsetList(string bhno, string cseq, string stockSymbol)
+        {
+            Logger.Log(1, "參數", $"獲取TCNUD與MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+            try
+            {
+                // 使用剛剛的 GetByTwoKey 函數來獲取 TCNUD 資料並與 MSTMB 進行 join
+                var tcnudList = await _repository.GetByTwoKey(bhno, cseq, stockSymbol);
+                var mstmbList = InMemoryCache.MSTMBData;
+
+                var result = (from tcnud in tcnudList
+                              join mstmb in mstmbList on tcnud.STOCK equals mstmb.STOCK
+                              select new UnOffset
+                              {
+                                  TCNUD = tcnud,
+                                  CNAME = mstmb.CNAME ?? string.Empty,
+                                  CPRICE = mstmb.CPRICE ?? 0m
+                              }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取TCNUD與MSTMB失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>
@@ -37,12 +66,17 @@ namespace WebApplication1.Service.Impl
                 decimal? mamt = bqty * mprice;
                 decimal? lastprice = unOffset.CPRICE;
                 decimal? cost = tcnud.COST;
-                decimal? estimateAmt = lastprice * tcnud.BQTY;
+                decimal? estimateAmt = Math.Floor((lastprice * tcnud.BQTY) ?? 0m);
                 decimal estFee = 0.001425m;
                 decimal estTax = 0.003m;
                 Logger.Log(2, "變數", $"手續費為：{estFee}, 稅率為：{estTax}");
-                decimal? estimateFee = estimateAmt * estFee;
-                decimal? estimateTax = estimateAmt * estTax;
+                decimal? estimateFee = Math.Floor((estimateAmt * estFee) ?? 0m);
+                if (estimateFee < 20m)
+                {
+                    estimateFee = 20m;
+                }
+
+                decimal? estimateTax = Math.Floor((estimateAmt * estTax) ?? 0m);
                 decimal? marketvalue = estimateAmt - estimateFee - estimateTax;
                 decimal? profit = marketvalue - cost;
                 string pl_ratio;
@@ -99,17 +133,11 @@ namespace WebApplication1.Service.Impl
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
         /// <returns>成功會回傳unOffsetDetailList，用來保存unOffsetDetail</returns>
-        public async Task<List<UnOffsetDetail>> GetUnOffsetDetailList(string bhno, string cseq)
+        public List<UnOffsetDetail> GetUnOffsetDetailList(List<UnOffset> list)
         {
             //建立一個dict，然後使用StringArrayComparer來對作為key的string[]檢查
             var unOffsetDetailList = new List<UnOffsetDetail>();
-            var list = (await _repository.GetByTwoKey(bhno, cseq)).ToList();
-            if (list.Count == 0)
-            {
-                Logger.Log(3, "警告", $"資料庫內找不到分公司{bhno}帳號{cseq}的交易紀錄");
-                return [] ;
-            }
-            Logger.Log(0, "成功", $"搜尋到{bhno}帳號{cseq}的{list.Count}筆交易紀錄");
+
 
             //List LinQ
             foreach (var unOffset in list)
@@ -143,6 +171,7 @@ namespace WebApplication1.Service.Impl
         /// <returns>成功會回傳單一股票的unOffsetSum，用來保存個股未實現損益</returns>
         public UnOffsetSum GetUnOffsetSum(List<UnOffsetDetail> list)
         {
+
             try
             {
                 string stock = list.FirstOrDefault()?.stock;
@@ -151,9 +180,13 @@ namespace WebApplication1.Service.Impl
                 decimal? cost = list.Sum(t => t.cost);
                 decimal? avgprice = cost / bqty;
                 decimal? marketvalue = list.Sum(t => t.marketvalue);
-                decimal? estimateAmt = list.Sum(t => t.estimateAmt);
-                decimal? estimateFee = list.Sum(t => t.estimateFee);
-                decimal? estimateTax = list.Sum(t => t.estimateTax);
+                decimal? estimateAmt = Math.Floor((list.Sum(t => t.estimateAmt)) ?? 0m);
+                decimal? estimateFee = Math.Floor((list.Sum(t => t.estimateFee)) ?? 0m);
+                if (estimateFee < 20m)
+                {
+                    estimateFee = 20m;
+                }
+                decimal? estimateTax = Math.Floor((list.Sum(t => t.estimateTax)) ?? 0m);
                 decimal? profit = list.Sum(t => t.profit);
                 decimal? fee = list.Sum(t => t.fee);
                 decimal? tax = list.Sum(t => t.tax);
@@ -208,7 +241,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">所有的個股明細</param>
         /// <returns>成功會回傳unOffsetSumList，用來保存所有的個股未實現損益</returns>
-        public async Task<List<UnOffsetSum>> GetUnOffsetSumList(List<UnOffsetDetail> list)
+        public List<UnOffsetSum> GetUnOffsetSumList(List<UnOffsetDetail> list)
         {
             List<UnOffsetSum> unOffsetSums = new List<UnOffsetSum>();
             var groupedUnOffsets = list.GroupBy(u => new { u.stock, u.stocknm });
@@ -241,7 +274,7 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="list">所有的個股未實現損益</param>
         /// <returns>成功會回傳unoffset_qtype_accsum，用來保存帳號匯總</returns>
-        public async Task<UnOffsetAccsum> GetUnOffsetAccsum(List<UnOffsetSum> list)
+        public UnOffsetAccsum GetUnOffsetAccsum(List<UnOffsetSum> list)
         {
             Logger.Log(0, "開始", $"開始獲取國內證券-未實現損益 帳號彙總");
             UnOffsetAccsum unoffset_qtype_accsum = new UnOffsetAccsum();
@@ -273,9 +306,13 @@ namespace WebApplication1.Service.Impl
 
                 var fee = list.Sum(t => t.fee);
                 var tax = list.Sum(t => t.tax);
-                var estimateAmt = list.Sum(t => t.estimateAmt);
-                var estimateFee = list.Sum(t => t.estimateFee);
-                var estimateTax = list.Sum(t => t.estimateTax);
+                decimal? estimateAmt = Math.Floor((list.Sum(t => t.estimateAmt)) ?? 0m);
+                decimal? estimateFee = Math.Floor((list.Sum(t => t.estimateFee)) ?? 0m);
+                if (estimateFee < 20m)
+                {
+                    estimateFee = 20m;
+                }
+                decimal? estimateTax = Math.Floor((list.Sum(t => t.estimateTax)) ?? 0m);
 
                 //如果都沒問題就將errcode設為0000，errmsg設為成功
                 var errcode = "0000";
@@ -318,7 +355,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="errcode">錯誤碼</param>
         /// <param name="errmsg">錯誤訊息</param>
         /// <returns>成功會回傳unoffset_qtype_accsum，用來保存帳號匯總</returns>
-        public async Task<UnOffsetAccsum> GetFailedUnOffsetAccsum(string errcode, string errmsg)
+        public UnOffsetAccsum GetFailedUnOffsetAccsum(string errcode, string errmsg)
         {
             UnOffsetAccsum unoffset_qtype_accsum = new UnOffsetAccsum();
 
@@ -327,6 +364,39 @@ namespace WebApplication1.Service.Impl
             unoffset_qtype_accsum.unoffset_qtype_sum = [];
 
             return unoffset_qtype_accsum;
+        }
+
+        public async Task<UnOffsetAccsum> GetUnOffsetService(string bhno, string cseq, string stockSymbol)
+        {
+            try
+            {
+                //資料庫內尋找所有的交易紀錄，如果沒找到任何紀錄就會回傳404 Not Found
+                Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
+                var UnOffsetList = await GetUnOffsetList(bhno, cseq, stockSymbol);
+                var UnOffsetDetailList = GetUnOffsetDetailList(UnOffsetList);
+                if (UnOffsetDetailList == null)
+                {
+                    return GetFailedUnOffsetAccsum("404", "未實現損益 – 個股明細獲取失敗");
+                }
+                if (UnOffsetDetailList.Count == 0)
+                {
+                    return GetFailedUnOffsetAccsum("404", $"未找到{bhno}帳號{cseq}的交易紀錄");
+                }
+                var UnOffsetSumList = GetUnOffsetSumList(UnOffsetDetailList);
+                if (UnOffsetSumList == null)
+                {
+                    return GetFailedUnOffsetAccsum("404", "個股未實現損益獲取失敗");
+                }
+                var response = GetUnOffsetAccsum(UnOffsetSumList);
+                return response;
+            }
+            //過程中未防呆的部分都會抓到這邊
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"搜尋{bhno}帳號{cseq}的交易紀錄時出現了錯誤：{ex}");
+                var response = GetFailedUnOffsetAccsum("500", "Internal Server Error");
+                return response;
+            }
         }
     }
 }

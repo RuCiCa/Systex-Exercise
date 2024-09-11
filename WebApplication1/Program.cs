@@ -9,6 +9,7 @@ using WebApplication1.Service.Impl;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebApplication1.Repositories.Api;
 using WebApplication1.Repositories.Impl;
+using WebApplication1.service.dtos;
 
 //Util util = new Util();
 //util.InsertFileDB("D:\\vs_studio\\vs_studio_workspace\\帳務中心－學習新手包\\帳務中心_學習新手包_題目1\\題目一_Insert_MSTMB.txt");
@@ -30,14 +31,20 @@ builder.Services.AddSwaggerGen();
 // 在 Autofac 容器中註冊服務
 builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
 {
-    containerBuilder.RegisterType<Repository>().As<IRepository>().InstancePerLifetimeScope();
+
     containerBuilder.RegisterType<ErrorService>().As<IErrorService>().InstancePerLifetimeScope();
 
+    containerBuilder.RegisterType<UnOffsetRepository>().As<IUnOffsetRepository>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<UnOffsetAccsum>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<UnOffsetService>().As<IUnOffsetService>().InstancePerLifetimeScope();
 
+    containerBuilder.RegisterType<ProfitRepository>().As<IProfitRepository>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<ProfitAccsum>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<ProfitService>().As<IProfitService>().InstancePerLifetimeScope();
+
+    containerBuilder.RegisterType<ProfileRepository>().As<IProfileRepository>().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<ProfileSum>().AsSelf().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<ProfileService>().As<IProfileService>().InstancePerLifetimeScope();
 });
 
 var app = builder.Build();
@@ -50,6 +57,8 @@ using (var scope = app.Services.CreateScope())
     InMemoryCache.HCNTDData = context.HCNTDTable.ToList();
     InMemoryCache.TCNUDData = context.TCNUDTable.ToList();
     InMemoryCache.MSTMBData = context.MSTMBTable.ToList();
+    InMemoryCache.HCMIOData = context.HCMIOTable.ToList();
+    InMemoryCache.TMHIOData = context.TMHIOTable.ToList();
 }
 
 if (app.Environment.IsDevelopment())

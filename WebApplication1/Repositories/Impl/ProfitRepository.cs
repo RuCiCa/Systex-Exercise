@@ -11,38 +11,13 @@ using WebApplication1.Service.Dtos;
 
 namespace WebApplication1.Repositories.Impl
 {
-    public class Repository : IRepository
+    public class ProfitRepository : IProfitRepository
     {
         private readonly MyDbContext _context;
-        private readonly UnOffsetAccsum _unOffsetAccsum;
 
-        public Repository(MyDbContext context, UnOffsetAccsum unOffsetAccsum)
+        public ProfitRepository(MyDbContext context)
         {
-            _unOffsetAccsum = unOffsetAccsum;
             _context = context;
-        }
-
-
-        /// <summary>
-        /// 取出TCNUD跟MSTMB
-        /// </summary>
-        /// <param name="bhno">分公司</param>
-        /// <param name="cseq">帳號</param>
-        /// <returns>回傳UnOffset，裡面包含TCNUD跟CNAME還有CPRICE</returns>
-        public async Task<IEnumerable<UnOffset>> GetByTwoKey(string bhno, string cseq)
-        {
-            var query = from tcnud in InMemoryCache.TCNUDData
-                        join mstmb in InMemoryCache.MSTMBData on tcnud.STOCK equals mstmb.STOCK
-                        where tcnud.BHNO == bhno &&
-                              tcnud.CSEQ == cseq
-                        select new UnOffset
-                        {
-                            TCNUD = tcnud,
-                            CNAME = mstmb.CNAME,
-                            CPRICE = mstmb.CPRICE
-                        };
-
-            return await Task.FromResult(query.ToList());
         }
 
         /// <summary>
@@ -52,15 +27,18 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="cseq">帳號</param>
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的歷史現股沖銷以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<HCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate)
+        public async Task<IEnumerable<HCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
+            Logger.Log(1, "參數", $"sdate{string.Compare("20201228", sdate)}, edate{string.Compare("20201228", edate)}");
             var query = from hcnrh in InMemoryCache.HCNRHData
                         where hcnrh.CSEQ == cseq &&
                               hcnrh.BHNO == bhno &&
                               string.Compare(hcnrh.TDATE, sdate) >= 0 &&
-                              string.Compare(hcnrh.TDATE, edate) <= 0
-                        select new HCNRH
+                              string.Compare(hcnrh.TDATE, edate) <= 0 &&
+                              (string.IsNullOrEmpty(stockSymbol) || hcnrh.STOCK == stockSymbol)
+                        select new ExtendedHCNRH
                         {
                             STOCK = hcnrh.STOCK ?? string.Empty,
                             CSEQ = hcnrh.CSEQ ?? string.Empty,
@@ -103,15 +81,17 @@ namespace WebApplication1.Repositories.Impl
         /// <param name="cseq">帳號</param>
         /// <param name="sdate">開始日</param>
         /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代碼</param>
         /// <returns>回傳開始日到結束日之間的歷史現股當沖以及CNAME跟STOCK</returns>
-        public async Task<IEnumerable<HCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate)
+        public async Task<IEnumerable<HCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             var query = from hcntd in InMemoryCache.HCNTDData
                         where hcntd.CSEQ == cseq &&
                               hcntd.BHNO == bhno &&
                               string.Compare(hcntd.TDATE, sdate) >= 0 &&
-                              string.Compare(hcntd.TDATE, edate) <= 0
-                        select new HCNTD
+                              string.Compare(hcntd.TDATE, edate) <= 0 &&
+                              (string.IsNullOrEmpty(stockSymbol) || hcntd.STOCK == stockSymbol)
+                        select new ExtendedHCNTD
                         {
                             STOCK = hcntd.STOCK ?? string.Empty,
                             CSEQ = hcntd.CSEQ ?? string.Empty,

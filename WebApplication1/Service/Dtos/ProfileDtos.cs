@@ -42,7 +42,7 @@
         public decimal tax { get; set; }
         public decimal mqty { get; set; }
         public decimal mamt { get; set; }
-        public Billsum billSum { get; set; }
+        public BillSum billSum { get; set; }
         public List<Profile> profile { get; set; }
     }
 }

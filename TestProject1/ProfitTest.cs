@@ -1,133 +1,119 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using WebApplication1.Service.Dtos;
 using WebApplication1.Service.Impl;
 using WebApplication1.Common.HCN;
+using WebApplication1.service.dtos;
+using WebApplication1.Common;
+using WebApplication1.Service.Api;
 
 namespace TestProject1
 {
     public class ProfitServiceTests
     {
         private ProfitService _profitService;
+        private Calc _calc;
 
         [SetUp]
         public void Setup()
         {
-            _profitService = new ProfitService(null, new ProfitAccsum(), null);
+            _calc = new Calc();
+            _profitService = new ProfitService(null, new ProfitAccsum(), null, _calc); // 初始化 ProfileService
         }
 
         [Test]
-        public async Task TestSumProfitDetailOut()
+        public async Task ProfitSum_HCNRH_Calculation_Check()
         {
             // Arrange
-            List<ProfitDetailOut> profitDetailOutsHCNRH = (await _profitService.GetProfitDetailOutList(ProfitTestHelper.GetSampleExtendedHCNRH().Cast<dynamic>().ToList())).ToList();
-            List<ProfitDetailOut> profitDetailOutsHCNTD = (await _profitService.GetProfitDetailOutList(ProfitTestHelper.GetSampleExtendedHCNTD().Cast<dynamic>().ToList())).ToList();
-            List<ProfitDetailOut> profitDetailOuts = profitDetailOutsHCNRH.Concat(profitDetailOutsHCNTD).ToList();
+            var hcnrhList = ProfitTestHelper.GetSampleExtendedHCNRH();
 
             // Act
-            List<ProfitDetailOut> summedProfitDetails = (await _profitService.SumProfitDetailOut(profitDetailOuts)).ToList();
-
+            var profitDetailSets = await _profitService.GetProfitDetailSets(hcnrhList.Cast<dynamic>().ToList());
+            Assert.AreEqual(1, profitDetailSets.Count);
+            Assert.AreEqual(3, profitDetailSets.FirstOrDefault().profitDetails.Count);
+            var profitSumList = await _profitService.GetProfitSumList("001", "A12345", profitDetailSets);
+            var profitSum = profitSumList.FirstOrDefault();
             // Assert
-            Assert.IsNotNull(summedProfitDetails);
-            Assert.AreEqual(3, summedProfitDetails.Count);
-            Assert.AreEqual("2330", summedProfitDetails[0].stock);
-            //50000+25000
-            Assert.AreEqual(75000, summedProfitDetails[0].cost);
-            //100+50
-            Assert.AreEqual(150, summedProfitDetails[0].cqty);
-            //9+3
-            Assert.AreEqual(12, summedProfitDetails[0].fee);
-            //52000+26000
-            Assert.AreEqual(78000, summedProfitDetails[0].income);
-            //
-            Assert.AreEqual("65000", summedProfitDetails[0].mamt);
-            //0+0
-            Assert.AreEqual(0, summedProfitDetails[0].mqty);
-            //52000+26000
-            Assert.AreEqual(78000, summedProfitDetails[0].netamt);
-            //(52000+26000)/(52000+26000)
-            Assert.AreEqual("100%", summedProfitDetails[0].pl_ratio);
-            //0+0
-            Assert.AreEqual(0, summedProfitDetails[0].tax);
+            Assert.NotNull(profitSumList);
+            Assert.AreEqual("20210104", profitSum.tdate);
+            Assert.AreEqual("t0146", profitSum.dseq);
+            Assert.AreEqual("0000005", profitSum.dno);
+            Assert.AreEqual("0", profitSum.ttype);
+            Assert.AreEqual("現股", profitSum.ttypename);
+            Assert.AreEqual("S", profitSum.bstype);
+            Assert.AreEqual("2337", profitSum.stock);
+            Assert.AreEqual(4000, profitSum.cqty);
+            Assert.AreEqual("41.8500", profitSum.mprice);
+            Assert.AreEqual(239, profitSum.fee);
+            Assert.AreEqual(502, profitSum.tax);
+            Assert.AreEqual(174897, profitSum.cost);
+            Assert.AreEqual(166659, profitSum.income);
+            Assert.AreEqual(-8238, profitSum.profit);
+            Assert.AreEqual("-4.71%", profitSum.pl_ratio);
+            Assert.AreEqual("0", profitSum.ctype);
+            Assert.AreEqual("現賣", profitSum.ttypename2);
         }
 
         [Test]
-        public async Task TestGetProfitSum()
+        public async Task ProfitSum_HCNTD_Calculation_Check()
         {
             // Arrange
-            var profitDetailOut = new ProfitDetailOut
-            {
-                stock = "2330",
-                stocknm = "台積電",
-                tdate = "20240802",
-                dseq = "S001",
-                dno = "SN001",
-                cqty = 100,
-                cost = 50000m,
-                income = 52000m,
-                profit = 2000m
-            };
-
-            List<ProfitDetail> profitDetailsHCNRH = await _profitService.GetProfitDetailList(ProfitTestHelper.GetSampleExtendedHCNRH().Cast<dynamic>().ToList());
-            List<ProfitDetail> profitDetailsHCNTD = await _profitService.GetProfitDetailList(ProfitTestHelper.GetSampleExtendedHCNTD().Cast<dynamic>().ToList());
-            List<ProfitDetail> profitDetails = profitDetailsHCNRH.Concat(profitDetailsHCNTD).ToList();
+            var hcntdList = ProfitTestHelper.GetSampleExtendedHCNTD();
 
             // Act
-            var profitSum = _profitService.GetProfitSum(profitDetailOut, profitDetails, "001", "A12345");
-
+            var profitDetailSets = await _profitService.GetProfitDetailSets(hcntdList.Cast<dynamic>().ToList());
+            Assert.AreEqual(3, profitDetailSets.Count);
+            Assert.AreEqual(1, profitDetailSets.FirstOrDefault().profitDetails.Count);
+            var profitSumList = await _profitService.GetProfitSumList("001", "A12345", profitDetailSets);
+            var profitSum = profitSumList.FirstOrDefault();
             // Assert
-            Assert.IsNotNull(profitSum);
-            Assert.AreEqual("2330", profitSum.stock);
-            Assert.AreEqual("台積電", profitSum.stocknm);
-            Assert.AreEqual("S001", profitSum.dseq);
-            Assert.AreEqual(2000, profitSum.profit);
-            Assert.AreEqual(50000, profitSum.cost);
-            // 2000/50000
-            Assert.AreEqual("4.00%", profitSum.pl_ratio);
-            Assert.AreEqual(4, profitSum.profit_detail.Count);
+            Assert.NotNull(profitSumList);
+            Assert.AreEqual("20210104", profitSum.tdate);
+            Assert.AreEqual("0000016", profitSum.dseq);
+            Assert.AreEqual("0000020", profitSum.dno);
+            Assert.AreEqual("0", profitSum.ttype);
+            Assert.AreEqual("現股", profitSum.ttypename);
+            Assert.AreEqual("S", profitSum.bstype);
+            Assert.AreEqual("8069", profitSum.stock);
+            Assert.AreEqual(1000, profitSum.cqty);
+            Assert.AreEqual("48.2500", profitSum.mprice);
+            Assert.AreEqual(68, profitSum.fee);
+            Assert.AreEqual(72, profitSum.tax);
+            Assert.AreEqual(49320, profitSum.cost);
+            Assert.AreEqual(48110, profitSum.income);
+            Assert.AreEqual(-1210, profitSum.profit);
+            Assert.AreEqual("-2.45%", profitSum.pl_ratio);
+            Assert.AreEqual("0", profitSum.ctype);
+            Assert.AreEqual("賣沖", profitSum.ttypename2);
         }
 
         [Test]
-        public async Task TestGetProfittAccsum()
+        public async Task ProfitAccsum_Calculation_Check()
         {
             // Arrange
-            List<ProfitDetailOut> profitDetailOutsHCNRH = (await _profitService.GetProfitDetailOutList(ProfitTestHelper.GetSampleExtendedHCNRH().Cast<dynamic>().ToList())).ToList();
-            List<ProfitDetailOut> profitDetailOutsHCNTD = (await _profitService.GetProfitDetailOutList(ProfitTestHelper.GetSampleExtendedHCNTD().Cast<dynamic>().ToList())).ToList();
-            List<ProfitDetailOut> profitDetailOuts = profitDetailOutsHCNRH.Concat(profitDetailOutsHCNTD).ToList();
-            List<ProfitDetailOut> summedProfitDetails = (await _profitService.SumProfitDetailOut(profitDetailOuts)).ToList();
-
-            List<ProfitDetail> profitDetailsHCNRH = await _profitService.GetProfitDetailList(ProfitTestHelper.GetSampleExtendedHCNRH().Cast<dynamic>().ToList());
-            List<ProfitDetail> profitDetailsHCNTD = await _profitService.GetProfitDetailList(ProfitTestHelper.GetSampleExtendedHCNTD().Cast<dynamic>().ToList());
-            List<ProfitDetail> profitDetails = profitDetailsHCNRH.Concat(profitDetailsHCNTD).ToList();
-
-            var profitSums = new List<ProfitSum>();
-
-            foreach (var detailOut in summedProfitDetails)
-            {
-                var profitSum = _profitService.GetProfitSum(detailOut, profitDetails, "001", "A12345");
-                profitSums.Add(profitSum);
-            }
+            var hcntdList = ProfitTestHelper.GetOneExtendedHCNTD();
+            var hcnrhList = ProfitTestHelper.GetSampleExtendedHCNRH();
 
             // Act
-            var profitAccsum = await _profitService.GetProfittAccsum(profitSums);
+            var HCNTDSets = await _profitService.GetProfitDetailSets(hcntdList.Cast<dynamic>().ToList());
+            var HCNRHSets = await _profitService.GetProfitDetailSets(hcnrhList.Cast<dynamic>().ToList());
+            var profitDetailSets = HCNTDSets.Concat(HCNRHSets).ToList();
+            var profitSumList = await _profitService.GetProfitSumList("001", "A12345", profitDetailSets);
+            var profitAccsum = await _profitService.GetProfittAccsum(profitSumList);
 
             // Assert
-            Assert.IsNotNull(profitAccsum);
+            Assert.NotNull(profitSumList);
             Assert.AreEqual("0000", profitAccsum.errcode);
-            //75000+20000+20000
-            Assert.AreEqual(75000+20000+20000, profitAccsum.cost);
-            //150+200+200
-            Assert.AreEqual(150+200+200, profitAccsum.cqty);
-            //12+4+4
-            Assert.AreEqual(12+4+4, profitAccsum.fee);
-            //78000+22000+22000
-            Assert.AreEqual(78000+22000+22000, profitAccsum.income);
-            //(75000+20000+20000)/(75000+20000+20000)*100
-            Assert.AreEqual("100%", profitAccsum.pl_ratio);
-            //75000+20000+20000
-            Assert.AreEqual(75000+20000+20000, profitAccsum.profit);
-            Assert.AreEqual(3, profitAccsum.profit_sum.Count);
+            Assert.AreEqual("成功", profitAccsum.errmsg);
+            Assert.AreEqual(4000 + 1000, profitAccsum.cqty);
+            Assert.AreEqual(174897 + 49320, profitAccsum.cost);
+            Assert.AreEqual(166659 + 48110, profitAccsum.income);
+            Assert.AreEqual(-8238 - 1210, profitAccsum.profit);
+            Assert.AreEqual("-4.21%", profitAccsum.pl_ratio);
+            Assert.AreEqual(239 + 68, profitAccsum.fee);
+            Assert.AreEqual(502 + 72, profitAccsum.tax);
         }
     }
 }
