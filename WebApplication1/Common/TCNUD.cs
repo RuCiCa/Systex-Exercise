@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace WebApplication1.Common
 {
@@ -61,5 +62,14 @@ namespace WebApplication1.Common
 
         [MaxLength(10)]
         public string? IOFLAG { get; set; }
+    }
+    public class ExtendedTCNUD : TCNUD
+    {
+        [JsonIgnore]
+        public decimal AMT { get; set; }
+        [JsonIgnore]
+        public string CNAME { get; set; }
+        [JsonIgnore]
+        public decimal? CPRICE { get; set; }
     }
 }

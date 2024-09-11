@@ -21,7 +21,7 @@ namespace WebApplication1.Service.Impl
             _repository = repository;
         }
 
-        public async Task<List<UnOffset>> GetUnOffsetList(string bhno, string cseq, string stockSymbol)
+        public async Task<List<ExtendedTCNUD>> GetUnOffsetList(string bhno, string cseq, string stockSymbol)
         {
             Logger.Log(1, "參數", $"獲取TCNUD與MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
             try
@@ -29,15 +29,66 @@ namespace WebApplication1.Service.Impl
                 // 使用剛剛的 GetByTwoKey 函數來獲取 TCNUD 資料並與 MSTMB 進行 join
                 var tcnudList = await _repository.GetByTwoKey(bhno, cseq, stockSymbol);
                 var mstmbList = InMemoryCache.MSTMBData;
+                var tmhioList = InMemoryCache.TMHIOData;
 
                 var result = (from tcnud in tcnudList
                               join mstmb in mstmbList on tcnud.STOCK equals mstmb.STOCK
-                              select new UnOffset
+                              select new ExtendedTCNUD
                               {
-                                  TCNUD = tcnud,
-                                  CNAME = mstmb.CNAME ?? string.Empty,
-                                  CPRICE = mstmb.CPRICE ?? 0m
+                                  TDATE = tcnud.TDATE,
+                                  BHNO = tcnud.BHNO,
+                                  CSEQ = tcnud.CSEQ,
+                                  STOCK = tcnud.STOCK,
+                                  PRICE = tcnud.PRICE,
+                                  QTY = tcnud.QTY,
+                                  BQTY = tcnud.BQTY,
+                                  FEE = tcnud.FEE,
+                                  COST = tcnud.COST,
+                                  DSEQ = tcnud.DSEQ,
+                                  DNO = tcnud.DNO,
+                                  ADJDATE = tcnud.ADJDATE,
+                                  WTYPE = tcnud.WTYPE,
+                                  TRDATE = tcnud.TRDATE,
+                                  TRTIME = tcnud.TRTIME,
+                                  MODATE = tcnud.MODATE,
+                                  MODTIME = tcnud.MODTIME,
+                                  MODUSER = tcnud.MODUSER,
+                                  IOFLAG = tcnud.IOFLAG,
+
+                                  AMT = 0,
+                                  CNAME = mstmb.CNAME,
+                                  CPRICE = mstmb.CPRICE 
                               }).ToList();
+
+                var tmhioResult = (from tmhio in tmhioList
+                                   join mstmb in mstmbList on tmhio.STOCK equals mstmb.STOCK
+                                   select new ExtendedTCNUD
+                                   {
+                                       // 映射 TCNUD 資料
+                                       TDATE = tmhio.TDATE,
+                                       BHNO = tmhio.BHNO,
+                                       CSEQ = tmhio.CSEQ,
+                                       STOCK = tmhio.STOCK,
+                                       PRICE = tmhio.PRICE,
+                                       QTY = tmhio.QTY,
+                                       BQTY = tmhio.QTY,
+                                       FEE = _calc.feeCalc(tmhio.PRICE, (decimal)tmhio.QTY),
+                                       COST = _calc.mamtCalc(tmhio.PRICE, (decimal)tmhio.QTY) + _calc.feeCalc(tmhio.PRICE, (decimal)tmhio.QTY),
+                                       DSEQ = tmhio.DSEQ,
+                                       DNO = tmhio.JRNUM,
+                                       WTYPE = "0",
+                                       TRDATE = tmhio.TRDATE,
+                                       TRTIME = tmhio.TRTIME,
+                                       MODTIME = tmhio.MODTIME,
+                                       MODUSER = tmhio.MODUSER,
+
+                                       // 計算或映射 ExtendedTCNUD 額外屬性
+                                       AMT = _calc.mamtCalc(tmhio.PRICE, (decimal)tmhio.QTY), // AMT 計算方式假設為 PRICE * QTY
+                                       CNAME = mstmb.CNAME,
+                                       CPRICE = mstmb.CPRICE
+                                   }).ToList();
+
+                result = result.Concat(tmhioResult).ToList();
 
                 return result;
             }
@@ -53,20 +104,19 @@ namespace WebApplication1.Service.Impl
         /// </summary>
         /// <param name="unOffset">存放TCNUD以及CNAME跟CPRICE</param>
         /// <returns>成功會回傳unOffsetDetail，用來保存</returns>
-        public UnOffsetDetail GetUnOffsetDetail(UnOffset unOffset)
+        public UnOffsetDetail GetUnOffsetDetail(ExtendedTCNUD extendedTCNUD)
         {
-            TCNUD tcnud = unOffset.TCNUD;
-            Logger.Log(0, "開始", $"開始計算{unOffset.CNAME}之未實現損益 – 個股明細，委託書號{tcnud.DSEQ}-分單號碼{tcnud.DNO}");
+            Logger.Log(0, "開始", $"開始計算{extendedTCNUD.CNAME}之未實現損益 – 個股明細，委託書號{extendedTCNUD.DSEQ}-分單號碼{extendedTCNUD.DNO}");
             try
             {
-                string stock = tcnud.STOCK;
-                string stocknm = unOffset.CNAME;
-                decimal? bqty = tcnud.BQTY;
-                decimal? mprice = tcnud.PRICE;
-                decimal? mamt = bqty * mprice;
-                decimal? lastprice = unOffset.CPRICE;
-                decimal? cost = tcnud.COST;
-                decimal? estimateAmt = Math.Floor((lastprice * tcnud.BQTY) ?? 0m);
+                string stock = extendedTCNUD.STOCK;
+                string stocknm = extendedTCNUD.CNAME;
+                decimal? bqty = extendedTCNUD.BQTY;
+                decimal? mprice = extendedTCNUD.PRICE;
+                decimal? mamt = extendedTCNUD.AMT;
+                decimal? lastprice = extendedTCNUD.CPRICE;
+                decimal? cost = extendedTCNUD.COST;
+                decimal? estimateAmt = Math.Floor((lastprice * extendedTCNUD.BQTY) ?? 0m);
                 decimal estFee = 0.001425m;
                 decimal estTax = 0.003m;
                 Logger.Log(2, "變數", $"手續費為：{estFee}, 稅率為：{estTax}");
@@ -95,18 +145,18 @@ namespace WebApplication1.Service.Impl
                 {
                     stock = stock,
                     stocknm = stocknm,
-                    tdate = tcnud.TDATE,
+                    tdate = extendedTCNUD.TDATE,
                     ttype = "0",
                     ttypename = "現買",
                     bstype = "B",
-                    dseq = tcnud.DSEQ,
-                    dno = tcnud.DNO,
+                    dseq = extendedTCNUD.DSEQ,
+                    dno = extendedTCNUD.DNO,
                     bqty = bqty,
                     mprice = mprice,
                     mamt = mamt,
                     lastprice = lastprice,
                     marketvalue = marketvalue,
-                    fee = tcnud.FEE,
+                    fee = extendedTCNUD.FEE,
                     tax = 0,
                     cost = cost,
                     estimateAmt = estimateAmt,
@@ -115,7 +165,7 @@ namespace WebApplication1.Service.Impl
                     profit = profit,
                     pl_ratio = pl_ratio
                 };
-                Logger.Log(0, "成功", $"{unOffset.CNAME}之未實現損益 – 個股明細，委託書號{tcnud.DSEQ}-分單號碼{tcnud.DNO}計算成功");
+                Logger.Log(0, "成功", $"{extendedTCNUD.CNAME}之未實現損益 – 個股明細，委託書號{extendedTCNUD.DSEQ}-分單號碼{extendedTCNUD.DNO}計算成功");
                 return unOffsetDetail;
             }
             //透過errorHandler來處理errcode跟errmsg
@@ -133,7 +183,7 @@ namespace WebApplication1.Service.Impl
         /// <param name="bhno">分公司</param>
         /// <param name="cseq">帳號</param>
         /// <returns>成功會回傳unOffsetDetailList，用來保存unOffsetDetail</returns>
-        public List<UnOffsetDetail> GetUnOffsetDetailList(List<UnOffset> list)
+        public List<UnOffsetDetail> GetUnOffsetDetailList(List<ExtendedTCNUD> list)
         {
             //建立一個dict，然後使用StringArrayComparer來對作為key的string[]檢查
             var unOffsetDetailList = new List<UnOffsetDetail>();
