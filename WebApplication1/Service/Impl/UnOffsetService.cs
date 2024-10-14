@@ -123,7 +123,6 @@ namespace WebApplication1.Service.Impl
             }
         }
 
-        //¸ÉBSTYPE
         public List<ExtendedTCNUD> GetTCSIOList(List<TCSIO> tcsioList)
         {
             try
