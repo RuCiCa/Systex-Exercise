@@ -70,6 +70,7 @@ namespace WebApplication1.Common
     }
     public class ExtendedTCNUD : TCNUD
     {
+        public string BSTYPE { get; set; }
         [JsonIgnore]
         public string CNAME { get; set; }
         [JsonIgnore]

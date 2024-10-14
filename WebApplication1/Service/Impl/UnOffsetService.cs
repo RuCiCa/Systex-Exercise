@@ -159,7 +159,8 @@ namespace WebApplication1.Service.Impl
                                   CNAME = mstmbDict[tcsio.STOCK].CNAME,
                                   CPRICE = mstmbDict[tcsio.STOCK].CPRICE,
                                   IOFLAG = tcsio.IOFLAG,
-                                  IOFLAGNAME = _util.GetIoflagname(tcsio.IOFLAG, msysDict)
+                                  IOFLAGNAME = _util.GetIoflagname(tcsio.IOFLAG, msysDict),
+                                  BSTYPE = "B"
 
                               }).ToList();
                 return result;
