@@ -15,7 +15,7 @@ namespace WebApplication1.Common
         public string ETYPE { get; set; }  
         public string BSTYPE { get; set; }  
         public string STOCK { get; set; }  
-        public decimal? QTY { get; set; }  
+        public decimal QTY { get; set; }  
         public decimal PRICE { get; set; }  
         public string? SALES { get; set; }  
         public string? ORIGN { get; set; }  
@@ -25,6 +25,7 @@ namespace WebApplication1.Common
         public string? MODDATE { get; set; }  
         public string? MODTIME { get; set; }  
         public string? MODUSER { get; set; }  
+        public decimal? AMT { get; set; }
     }
     public class ExtendedTMHIO : TMHIO
     {
