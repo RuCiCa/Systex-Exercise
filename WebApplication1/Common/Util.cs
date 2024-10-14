@@ -108,7 +108,12 @@ namespace WebApplication1.Common
             return pl_ratio;
         }
 
-        //補說明
+        /// <summary>
+        /// 用來取得IOFlagName的function，輸入的IOFlag格式為3位或4位數字，輸入後如果是四位數字且0開頭，會去掉第一個零之後加上IOFLAG進行查詢
+        /// </summary>
+        /// <param name="IOFLAG">IOFLAG</param>
+        /// <param name="MSYSData">存放MSYS的dict</param>
+        /// <returns>查詢成功回傳Flag對應的Name，查詢失敗回傳轉換過的IOFLAG</returns>
         public string GetIoflagname(string IOFLAG, Dictionary<string, MSYS> MSYSData)
         {
             if (IOFLAG.StartsWith("0") && IOFLAG.Length >= 4)
@@ -121,9 +126,15 @@ namespace WebApplication1.Common
             {
                 return MSYSData[inputName].VALUE;
             }
-            return IOFLAG;
+            return inputName;
         }
 
+        /// <summary>
+        /// 用來合併List的function，並且如果其中一個有null也沒問題
+        /// </summary>
+        /// <param name="list1">第一個list</param>
+        /// <param name="list2">第二個list</param>
+        /// <returns>合併成功回傳合併好的list，合併失敗回傳null</returns>
         public List<T> ConcatLists<T>(List<T> list1, List<T> list2)
         {
             List<T>? list = (list1, list2) switch
