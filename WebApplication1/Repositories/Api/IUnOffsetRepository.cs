@@ -10,5 +10,7 @@ namespace WebApplication1.Repositories.Api
     public interface IUnOffsetRepository
     {
         Task<IEnumerable<TCNUD>> GetByTwoKey(string cseq, string bhno, string stockSymbol);
+        Task<IEnumerable<TMHIO>> GetByTwoKeyTMHIO(string bhno, string cseq, string stockSymbol);
+        Task<IEnumerable<TCSIO>> GetByTwoKeyTCSIO(string bhno, string cseq, string stockSymbol);
     }
 }

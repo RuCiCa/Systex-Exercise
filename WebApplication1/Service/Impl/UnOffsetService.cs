@@ -2,6 +2,7 @@ using Azure.Core;
 using System.Collections.Generic;
 using System.ComponentModel;
 using WebApplication1.Common;
+using WebApplication1.Common.HCN;
 using WebApplication1.Repositories.Api;
 using WebApplication1.Service.Api;
 using WebApplication1.Service.Dtos;
@@ -12,27 +13,31 @@ namespace WebApplication1.Service.Impl
     {
         private readonly UnOffsetAccsum _unOffsetAccsum;
         private readonly IUnOffsetRepository _repository;
-        private readonly Calc _calc;
+        private readonly Util _util;
+        private readonly InMemoryCache _inMemoryCache;
 
-        public UnOffsetService(UnOffsetAccsum unOffsetAccsum, IUnOffsetRepository repository, Calc calc)
+        public UnOffsetService(UnOffsetAccsum unOffsetAccsum, IUnOffsetRepository repository, Util util, InMemoryCache inMemoryCache)
         {
-            _calc = calc;
+            _util = util;
             _unOffsetAccsum = unOffsetAccsum;
             _repository = repository;
+            _inMemoryCache = inMemoryCache;
         }
 
-        public async Task<List<ExtendedTCNUD>> GetUnOffsetList(string bhno, string cseq, string stockSymbol)
+        public List<ExtendedTCNUD> GetTCNUDList(List<TCNUD> tcnudList)
         {
-            Logger.Log(1, "參數", $"獲取TCNUD與MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
             try
             {
-                // 使用剛剛的 GetByTwoKey 函數來獲取 TCNUD 資料並與 MSTMB 進行 join
-                var tcnudList = await _repository.GetByTwoKey(bhno, cseq, stockSymbol);
-                var mstmbList = InMemoryCache.MSTMBData;
-                var tmhioList = InMemoryCache.TMHIOData;
+                if (tcnudList.Count() == 0)
+                {
+                    Logger.Log(1, "參數", $"未找到TCNUD");
+                    return new List<ExtendedTCNUD>();
+                }
+                Logger.Log(1, "參數", $"TCNUD一共有{tcnudList.Count()}筆資料");
+                var mstmbDict = _inMemoryCache.MSTMBData;
 
+                Logger.Log(0, "開始", $"獲取TCNUD");
                 var result = (from tcnud in tcnudList
-                              join mstmb in mstmbList on tcnud.STOCK equals mstmb.STOCK
                               select new ExtendedTCNUD
                               {
                                   TDATE = tcnud.TDATE,
@@ -56,15 +61,35 @@ namespace WebApplication1.Service.Impl
                                   IOFLAG = tcnud.IOFLAG,
 
                                   AMT = 0,
-                                  CNAME = mstmb.CNAME,
-                                  CPRICE = mstmb.CPRICE 
+                                  CNAME = mstmbDict[tcnud.STOCK].CNAME,
+                                  CPRICE = mstmbDict[tcnud.STOCK].CPRICE,
+                                  ETYPE = ""
                               }).ToList();
 
-                var tmhioResult = (from tmhio in tmhioList
-                                   join mstmb in mstmbList on tmhio.STOCK equals mstmb.STOCK
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取TCNUD與MSTMB失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
+        }
+
+        public List<ExtendedTCNUD> GetTMHIOList(List<TMHIO> tmhioList)
+        {
+            try
+            {
+                if (tmhioList.Count() == 0)
+                {
+                    Logger.Log(1, "參數", $"未找到TMHIO");
+                    return new List<ExtendedTCNUD>();
+                }
+                Logger.Log(1, "參數", $"TMHIO一共有{tmhioList.Count()}筆資料");
+                var mstmbDict = _inMemoryCache.MSTMBData;
+
+                var result = (from tmhio in tmhioList
                                    select new ExtendedTCNUD
                                    {
-                                       // 映射 TCNUD 資料
                                        TDATE = tmhio.TDATE,
                                        BHNO = tmhio.BHNO,
                                        CSEQ = tmhio.CSEQ,
@@ -72,8 +97,8 @@ namespace WebApplication1.Service.Impl
                                        PRICE = tmhio.PRICE,
                                        QTY = tmhio.QTY,
                                        BQTY = tmhio.QTY,
-                                       FEE = _calc.feeCalc(tmhio.PRICE, (decimal)tmhio.QTY),
-                                       COST = _calc.mamtCalc(tmhio.PRICE, (decimal)tmhio.QTY) + _calc.feeCalc(tmhio.PRICE, (decimal)tmhio.QTY),
+                                       FEE = _util.CalcFee(tmhio.PRICE, (decimal)tmhio.QTY, etype: _util.TransEtpye(tmhio.ETYPE)),
+                                       COST = _util.CalcMamt(tmhio.PRICE, (decimal)tmhio.QTY) + _util.CalcFee(tmhio.PRICE, (decimal)tmhio.QTY, etype: _util.TransEtpye(tmhio.ETYPE)),
                                        DSEQ = tmhio.DSEQ,
                                        DNO = tmhio.JRNUM,
                                        WTYPE = "0",
@@ -82,19 +107,66 @@ namespace WebApplication1.Service.Impl
                                        MODTIME = tmhio.MODTIME,
                                        MODUSER = tmhio.MODUSER,
 
-                                       // 計算或映射 ExtendedTCNUD 額外屬性
-                                       AMT = _calc.mamtCalc(tmhio.PRICE, (decimal)tmhio.QTY), // AMT 計算方式假設為 PRICE * QTY
-                                       CNAME = mstmb.CNAME,
-                                       CPRICE = mstmb.CPRICE
+
+                                       ETYPE = _util.TransEtpye(tmhio.ETYPE),
+                                       AMT = _util.CalcMamt(tmhio.PRICE, (decimal)tmhio.QTY),
+                                       CNAME = mstmbDict[tmhio.STOCK].CNAME,
+                                       CPRICE = mstmbDict[tmhio.STOCK].CPRICE,
+
                                    }).ToList();
-
-                result = result.Concat(tmhioResult).ToList();
-
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.Log(4, "錯誤", $"獲取TCNUD與MSTMB失敗, 錯誤訊息: {ex.Message}");
+                Logger.Log(4, "錯誤", $"獲取TMHIO與MSTMB失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
+        }
+
+        //補BSTYPE
+        public List<ExtendedTCNUD> GetTCSIOList(List<TCSIO> tcsioList)
+        {
+            try
+            {
+                if (tcsioList.Count() == 0)
+                {
+                    Logger.Log(1, "參數", $"未找到TCSIO");
+                    return new List<ExtendedTCNUD>();
+                }
+                Logger.Log(1, "參數", $"TCSIO一共有{tcsioList.Count()}筆資料");
+                var mstmbDict = _inMemoryCache.MSTMBData;
+                var msysDict = _inMemoryCache.MSYSData;
+
+                var result = (from tcsio in tcsioList
+                              select new ExtendedTCNUD
+                              {
+                                  TDATE = tcsio.TDATE,
+                                  BHNO = tcsio.BHNO,
+                                  CSEQ = tcsio.CSEQ,
+                                  STOCK = tcsio.STOCK,
+                                  PRICE = 0,
+                                  QTY = tcsio.QTY,
+                                  BQTY = tcsio.QTY,
+                                  FEE = 0,
+                                  COST = 0,
+                                  DSEQ = tcsio.DSEQ,
+                                  DNO = tcsio.DNO,
+                                  WTYPE = "A",
+                                  TRDATE = tcsio.TRDATE,
+                                  TRTIME = tcsio.TRTIME,
+                                  MODTIME = tcsio.MODTIME,
+                                  MODUSER = tcsio.MODUSER,
+                                  CNAME = mstmbDict[tcsio.STOCK].CNAME,
+                                  CPRICE = mstmbDict[tcsio.STOCK].CPRICE,
+                                  IOFLAG = tcsio.IOFLAG,
+                                  IOFLAGNAME = _util.GetIoflagname(tcsio.IOFLAG, msysDict)
+
+                              }).ToList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取TMHIO與MSTMB失敗, 錯誤訊息: {ex.Message}");
                 return null;
             }
         }
@@ -130,6 +202,9 @@ namespace WebApplication1.Service.Impl
                 decimal? marketvalue = estimateAmt - estimateFee - estimateTax;
                 decimal? profit = marketvalue - cost;
                 string pl_ratio;
+                string ioflag = extendedTCNUD.IOFLAG;
+                string ioflagname = extendedTCNUD.IOFLAGNAME;
+                string wtype = extendedTCNUD.WTYPE;
 
                 if (cost != 0m)
                 {
@@ -163,7 +238,11 @@ namespace WebApplication1.Service.Impl
                     estimateFee = estimateFee,
                     estimateTax = estimateTax,
                     profit = profit,
-                    pl_ratio = pl_ratio
+                    pl_ratio = pl_ratio,
+                    ioflag = ioflag,
+                    ioname = ioflagname,
+                    wtype = wtype
+
                 };
                 Logger.Log(0, "成功", $"{extendedTCNUD.CNAME}之未實現損益 – 個股明細，委託書號{extendedTCNUD.DSEQ}-分單號碼{extendedTCNUD.DNO}計算成功");
                 return unOffsetDetail;
@@ -364,7 +443,6 @@ namespace WebApplication1.Service.Impl
                 }
                 decimal? estimateTax = Math.Floor((list.Sum(t => t.estimateTax)) ?? 0m);
 
-                //如果都沒問題就將errcode設為0000，errmsg設為成功
                 var errcode = "0000";
                 var errmsg = "成功";
 
@@ -422,8 +500,33 @@ namespace WebApplication1.Service.Impl
             {
                 //資料庫內尋找所有的交易紀錄，如果沒找到任何紀錄就會回傳404 Not Found
                 Logger.Log(0, "開始", $"開始搜尋{bhno}帳號{cseq}的交易紀錄");
-                var UnOffsetList = await GetUnOffsetList(bhno, cseq, stockSymbol);
-                var UnOffsetDetailList = GetUnOffsetDetailList(UnOffsetList);
+                List<TMHIO> tmhioList = (await _repository.GetByTwoKeyTMHIO(bhno, cseq, stockSymbol)).ToList();
+                List<TCNUD> tcnudList = (await _repository.GetByTwoKey(bhno, cseq, stockSymbol)).ToList();
+                List<TCSIO> tcsioList = (await _repository.GetByTwoKeyTCSIO(bhno, cseq, stockSymbol)).ToList();
+
+                Logger.Log(1, "參數", $"獲取TCNUD與MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+                var TMHIOList = GetTMHIOList(tmhioList);
+                Logger.Log(1, "參數", $"獲取數量為{TMHIOList.Count()}");
+
+                Logger.Log(1, "參數", $"獲取TCNUD與MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+                var TCNUDList = GetTCNUDList(tcnudList);
+                Logger.Log(1, "參數", $"獲取數量為{TCNUDList.Count()}");
+
+                Logger.Log(1, "參數", $"獲取TCNUD與MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+                var TCSIOList = GetTCSIOList(tcsioList);
+                Logger.Log(1, "參數", $"獲取數量為{TCSIOList.Count()}");
+
+
+                var list = new List<ExtendedTCNUD>();
+                if (TMHIOList.Count() == 0 && TCNUDList.Count() == 0 && TCSIOList.Count() == 0)
+                {
+                    return GetFailedUnOffsetAccsum("404", "未查詢到任何資料");
+                }
+                list = _util.ConcatLists(TMHIOList, TCNUDList);
+                list = _util.ConcatLists(list, TCSIOList);
+
+
+                var UnOffsetDetailList = GetUnOffsetDetailList(list);
                 if (UnOffsetDetailList == null)
                 {
                     return GetFailedUnOffsetAccsum("404", "未實現損益 – 個股明細獲取失敗");
