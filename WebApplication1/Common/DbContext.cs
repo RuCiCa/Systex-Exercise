@@ -17,10 +17,14 @@ namespace WebApplication1.Common
         public DbSet<HCNTD> HCNTDTable { get; set; }
         public DbSet<TMHIO> TMHIOTable { get; set; }
         public DbSet<HCMIO> HCMIOTable { get; set; }
+        public DbSet<TCSIO> TCSIOTable { get; set; }
+        public DbSet<MSYS> MSYSTable { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<MSTMB>()
+                .HasKey(c => new { c.STOCK });
             modelBuilder.Entity<TCNUD>()
                 .HasKey(c => new { c.BHNO, c.CSEQ, c.TDATE, c.DSEQ, c.DNO });
             modelBuilder.Entity<HCNRH>()
@@ -31,6 +35,11 @@ namespace WebApplication1.Common
                 .HasKey(c => new { c.TDATE, c.BHNO, c.DSEQ, c.JRNUM });
             modelBuilder.Entity<HCMIO>()
                 .HasKey(c => new { c.TDATE, c.BHNO, c.CSEQ, c.DSEQ, c.DNO });
+            modelBuilder.Entity<TCSIO>()
+                .HasKey(c => new { c.TDATE, c.BHNO, c.DSEQ, c.DNO });
+            modelBuilder.Entity<MSYS>()
+                .HasKey(c => new { c.VARNAME, c.NUMBER});
+
 
             modelBuilder.Entity<MSTMB>().ToTable("MSTMB");
             modelBuilder.Entity<TCNUD>().ToTable("TCNUD");
@@ -38,6 +47,8 @@ namespace WebApplication1.Common
             modelBuilder.Entity<HCNTD>().ToTable("HCNTD");
             modelBuilder.Entity<TMHIO>().ToTable("TMHIO");
             modelBuilder.Entity<HCMIO>().ToTable("HCMIO");
+            modelBuilder.Entity<TCSIO>().ToTable("TCSIO");
+            modelBuilder.Entity<MSYS>().ToTable("MSYS");
         }
     }
 

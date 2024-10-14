@@ -44,7 +44,7 @@ namespace WebApplication1.Controllers
             switch (qtype)
             {
                 case ("0001"):
-                    var unOffsetResponse = await _unOffsetService.GetUnOffsetService(bhno, cseq, qtype);
+                    var unOffsetResponse = await _unOffsetService.GetUnOffsetService(bhno, cseq, stockSymbol);
                     return Ok(unOffsetResponse);
                 case ("0002"):
                     var profitResponse = await _profitService.GetProfitService(bhno, cseq, request.sdate, request.Edate, stockSymbol);

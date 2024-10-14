@@ -13,18 +13,18 @@ namespace WebApplication1.Service.Impl
 {
     public class ProfitService : IProfitService
     {
-        private readonly MyDbContext _context;
         private readonly ProfitAccsum _profitAccsum;
         private readonly IProfitRepository _repository;
-        private readonly Calc _calc;
+        private readonly Util _util;
+        private readonly InMemoryCache _inMemoryCache; 
 
 
-        public ProfitService(MyDbContext context, ProfitAccsum profitAccsum, IProfitRepository repository, Calc calc)
+        public ProfitService(ProfitAccsum profitAccsum, IProfitRepository repository, Util util, InMemoryCache inMemoryCache)
         {
-            _calc = calc;
-            _context = context;
+            _util = util;
             _profitAccsum = profitAccsum;
             _repository = repository;
+            _inMemoryCache = inMemoryCache;
         }
 
 
@@ -46,7 +46,7 @@ namespace WebApplication1.Service.Impl
 
                 decimal cost = table.COST ?? 0m;
                 decimal profitVal = table.COST ?? 0m;
-                decimal pl_ratio = _calc.plRatioCalc(profitVal, cost);
+                decimal pl_ratio = _util.CalcPlRatio(profitVal, cost);
 
                 ProfitDetail profitDetail = new ProfitDetail()
                 {
@@ -103,7 +103,7 @@ namespace WebApplication1.Service.Impl
 
                 decimal cost = table.COST ?? 0m;
                 decimal profitVal = table.PROFIT ?? 0m;
-                decimal pl_ratio = _calc.plRatioCalc(profitVal, cost);
+                decimal pl_ratio = _util.CalcPlRatio(profitVal, cost);
 
                 ProfitDetailOut profitDetailOut = new ProfitDetailOut()
                 {
@@ -165,9 +165,7 @@ namespace WebApplication1.Service.Impl
                 string dseq = group.Key.Dseq;
                 string dno = group.Key.Dno;
 
-                // 針對每個群組建立 ProfitDetailSet
                 List<ProfitDetail> profitDetails = new List<ProfitDetail>();
-
                 List<ProfitDetailOut> combinedOuts = new List<ProfitDetailOut>();
 
                 foreach (var table in group)
@@ -226,7 +224,7 @@ namespace WebApplication1.Service.Impl
                     bstype = "S",
                     wtype = firstItem.wtype,
                     profit = list.Sum(t => t.profit),
-                    pl_ratio = _calc.plRatioCalc(list.Sum(t => t.profit).GetValueOrDefault(), list.Sum(t => t.cost).GetValueOrDefault()).ToString() + "%",
+                    pl_ratio = _util.CalcPlRatio(list.Sum(t => t.profit).GetValueOrDefault(), list.Sum(t => t.cost).GetValueOrDefault()).ToString() + "%",
                     ctype = "0",
                     ttypename2 = firstItem.ttypename2,
                 };
@@ -248,7 +246,6 @@ namespace WebApplication1.Service.Impl
         /// <returns>成功會回傳所有加總後ProfitDetailOut的list</returns>
         public ProfitSum GetProfitSum(List<ProfitDetail> profitDetail, ProfitDetailOut profitDetailOut, string bhno, string cseq)
         {
-            //用lin q group by把每筆給分組(?存起來
             try
             {
                 string tdate = profitDetailOut.tdate;
@@ -315,9 +312,8 @@ namespace WebApplication1.Service.Impl
             try
             {
                 var hcntdList = await _repository.GetByTwoKeyWithTimeForHCNTD(bhno, cseq, sdate, edate, stockSymbol);
-                var mstmbList = InMemoryCache.MSTMBData;
+                var mstmbDict = _inMemoryCache.MSTMBData;
                 var result = (from hcntd in hcntdList
-                              join mstmb in mstmbList on hcntd.STOCK equals mstmb.STOCK
                               select new ExtendedHCNTD
                               {
                                   STOCK = hcntd.STOCK ?? string.Empty,
@@ -344,7 +340,7 @@ namespace WebApplication1.Service.Impl
                                   MODDATE = hcntd.MODDATE ?? string.Empty,
                                   MODTIME = hcntd.MODTIME ?? string.Empty,
                                   MODUSER = hcntd.MODUSER ?? string.Empty,
-                                  CNAME = mstmb.CNAME ?? string.Empty 
+                                  CNAME = mstmbDict[hcntd.STOCK].CNAME ?? string.Empty 
                               }).ToList();
 
                 return result;
@@ -372,9 +368,8 @@ namespace WebApplication1.Service.Impl
             try
             {
                 var hcnrhList = await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate, stockSymbol);
-                var mstmbList = InMemoryCache.MSTMBData;
+                var mstmbDict = _inMemoryCache.MSTMBData;
                 var result = (from hcnrh in hcnrhList
-                              join mstmb in mstmbList on hcnrh.STOCK equals mstmb.STOCK
                               select new ExtendedHCNRH
                               {
                                   STOCK = hcnrh.STOCK ?? string.Empty,
@@ -406,7 +401,7 @@ namespace WebApplication1.Service.Impl
                                   STINTAX = hcnrh.STINTAX ?? 0m,
                                   IOFLAG = hcnrh.IOFLAG ?? string.Empty,
                                   ADJDATE = hcnrh.ADJDATE ?? string.Empty,
-                                  CNAME = mstmb.CNAME ?? string.Empty 
+                                  CNAME = mstmbDict[hcnrh.STOCK].CNAME ?? string.Empty 
                               }).ToList();
 
                 return result;

@@ -8,15 +8,18 @@ using WebApplication1.Common;
 using WebApplication1.Common.HCN;
 using WebApplication1.Repositories.Api;
 using WebApplication1.Service.Dtos;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace WebApplication1.Repositories.Impl
 {
     public class ProfileRepository : IProfileRepository
     {
         private readonly MyDbContext _context;
+        private readonly InMemoryCache _inMemoryCache;
 
-        public ProfileRepository(MyDbContext context)
+        public ProfileRepository(InMemoryCache inMemoryCache, MyDbContext context)
         {
+            _inMemoryCache = inMemoryCache;
             _context = context;
         }
 
@@ -32,7 +35,7 @@ namespace WebApplication1.Repositories.Impl
         /// <returns>回傳開始日到結束日之間的TMHIO以及CNAME</returns>
         public async Task<IEnumerable<TMHIO>> GetByTwoKeyWithTimeForTMHIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
-            var query = from tmhio in InMemoryCache.TMHIOData
+            var query = from tmhio in _context.TMHIOTable
                         where tmhio.CSEQ == cseq &&
                               tmhio.BHNO == bhno &&
                               string.Compare(tmhio.TDATE, sdate) >= 0 &&
@@ -50,7 +53,7 @@ namespace WebApplication1.Repositories.Impl
                             ETYPE = tmhio.ETYPE ?? string.Empty,
                             BSTYPE = tmhio.BSTYPE ?? string.Empty,
                             STOCK = tmhio.STOCK ?? string.Empty,
-                            QTY = tmhio.QTY ?? 0m,
+                            QTY = tmhio.QTY,
                             PRICE = tmhio.PRICE,
                             SALES = tmhio.SALES ?? string.Empty,
                             ORIGN = tmhio.ORIGN ?? string.Empty,
@@ -77,7 +80,7 @@ namespace WebApplication1.Repositories.Impl
         /// <returns>回傳開始日到結束日之間的歷史現股當沖以及CNAME跟STOCK</returns>
         public async Task<IEnumerable<HCMIO>> GetByTwoKeyWithTimeForHCMIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
-            var query = from hcmio in InMemoryCache.HCMIOData
+            var query = from hcmio in _context.HCMIOTable
                         where hcmio.CSEQ == cseq &&
                               hcmio.BHNO == bhno &&
                               string.Compare(hcmio.TDATE, sdate) >= 0 &&

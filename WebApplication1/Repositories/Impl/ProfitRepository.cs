@@ -8,15 +8,18 @@ using WebApplication1.Common;
 using WebApplication1.Common.HCN;
 using WebApplication1.Repositories.Api;
 using WebApplication1.Service.Dtos;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace WebApplication1.Repositories.Impl
 {
     public class ProfitRepository : IProfitRepository
     {
         private readonly MyDbContext _context;
+        private readonly InMemoryCache _inMemoryCache;
 
-        public ProfitRepository(MyDbContext context)
+        public ProfitRepository(MyDbContext context, InMemoryCache inMemoryCache)
         {
+            _inMemoryCache = inMemoryCache;
             _context = context;
         }
 
@@ -32,7 +35,7 @@ namespace WebApplication1.Repositories.Impl
         public async Task<IEnumerable<HCNRH>> GetByTwoKeyWithTimeForHCNRH(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
             Logger.Log(1, "參數", $"sdate{string.Compare("20201228", sdate)}, edate{string.Compare("20201228", edate)}");
-            var query = from hcnrh in InMemoryCache.HCNRHData
+            var query = from hcnrh in _context.HCNRHTable
                         where hcnrh.CSEQ == cseq &&
                               hcnrh.BHNO == bhno &&
                               string.Compare(hcnrh.TDATE, sdate) >= 0 &&
@@ -85,7 +88,7 @@ namespace WebApplication1.Repositories.Impl
         /// <returns>回傳開始日到結束日之間的歷史現股當沖以及CNAME跟STOCK</returns>
         public async Task<IEnumerable<HCNTD>> GetByTwoKeyWithTimeForHCNTD(string bhno, string cseq, string sdate, string edate, string stockSymbol)
         {
-            var query = from hcntd in InMemoryCache.HCNTDData
+            var query = from hcntd in _context.HCNTDTable
                         where hcntd.CSEQ == cseq &&
                               hcntd.BHNO == bhno &&
                               string.Compare(hcntd.TDATE, sdate) >= 0 &&

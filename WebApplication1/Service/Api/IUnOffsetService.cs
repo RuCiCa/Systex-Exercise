@@ -6,7 +6,8 @@ namespace WebApplication1.Service.Api
 {
     public interface IUnOffsetService
     {
-        Task<List<ExtendedTCNUD>> GetUnOffsetList(string bhno, string cseq, string stockSymbol);
+        List<ExtendedTCNUD> GetTCNUDList(List<TCNUD> tcnudList);
+        List<ExtendedTCNUD> GetTMHIOList(List<TMHIO> tmhioList);
         UnOffsetDetail GetUnOffsetDetail(ExtendedTCNUD extendedTCNUD);
         List<UnOffsetDetail> GetUnOffsetDetailList(List<ExtendedTCNUD> list);
         UnOffsetSum GetUnOffsetSum(List<UnOffsetDetail> list);

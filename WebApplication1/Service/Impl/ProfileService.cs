@@ -15,17 +15,17 @@ namespace WebApplication1.Service.Impl
 {
     public class ProfileService : IProfileService
     {
-        private readonly MyDbContext _context;
         private readonly ProfileSum _profileSum;
         private readonly IProfileRepository _repository;
-        private readonly Calc _calc;
+        private readonly Util _util;
+        private readonly InMemoryCache _inMemoryCache;
 
-        public ProfileService(MyDbContext context, ProfileSum profileSum, IProfileRepository repository, Calc calc)
+
+        public ProfileService(ProfileSum profileSum, IProfileRepository repository, Util util, InMemoryCache inMemoryCache)
         {
-            _context = context;
             _profileSum = profileSum;
             _repository = repository;
-            _calc = calc;
+            _util = util;
         }
 
         /// <summary>
@@ -53,24 +53,14 @@ namespace WebApplication1.Service.Impl
                     string ttypename = "";
                     string bstype = table.BSTYPE;
                     string bstypename = bstype is "B" ? "買" : "賣";
-                    string etype = table is ExtendedTMHIO ? table.ETYPE is "2" ? "1" : "0" : table.ETYPE;
+                    string etype = table is ExtendedTMHIO ? _util.TransEtpye(table.ETYPE) : table.ETYPE;
                     decimal mprice = table.PRICE;
                     decimal mqty = table.QTY;
-                    decimal mamt = table is ExtendedTMHIO ? _calc.mamtCalc(mprice, mqty) : table.AMT;
+                    decimal mamt = table is ExtendedTMHIO ? _util.CalcMamt(mprice, mqty) : table.AMT;
                     mamt = Math.Round(mamt);
-                    decimal fee = table is ExtendedTMHIO ? bstype is "S" ? 0 : _calc.feeCalc(mprice, mqty) : table.AMT;
-                    if (table is ExtendedTMHIO && bstype is "S" && fee < 20)
-                    {
-                        if (fee < 1 && etype is "1")
-                        {
-                            fee = 1;
-                        }
-                        else
-                        {
-                            fee = 20;
-                        }
-                    }
-                    decimal tax = table is ExtendedTMHIO ? _calc.taxCalc(mprice, mqty) : table.TAX;
+                    decimal fee = table is ExtendedTMHIO ?  _util.CalcFee(mprice, mqty, etype: etype) : table.FEE;
+                    //交易稅分買賣
+                    decimal tax = table is ExtendedTMHIO ? _util.CalcTax(mprice, mqty) : table.TAX;
                     tax = Math.Round(tax);
                     decimal netamt = table is ExtendedTMHIO ? ttype is "B" ? -(mamt + fee) : mamt - fee - tax : table.NETAMT;
 
@@ -265,9 +255,8 @@ namespace WebApplication1.Service.Impl
                 if (string.Compare(todayString, sdate) >= 0 && string.Compare(todayString, edate) <= 0)
                 {
                     var tmhioList = await _repository.GetByTwoKeyWithTimeForTMHIO(bhno, cseq, sdate, edate, stockSymbol);
-                    var mstmbList = InMemoryCache.MSTMBData;
+                    var mstmbDict = _inMemoryCache.MSTMBData;
                     var result = (from tmhio in tmhioList
-                                  join mstmb in mstmbList on tmhio.STOCK equals mstmb.STOCK
                                   select new ExtendedTMHIO
                                   {
                                       TDATE = tmhio.TDATE ?? string.Empty,
@@ -280,7 +269,7 @@ namespace WebApplication1.Service.Impl
                                       ETYPE = tmhio.ETYPE ?? string.Empty,
                                       BSTYPE = tmhio.BSTYPE ?? string.Empty,
                                       STOCK = tmhio.STOCK ?? string.Empty,
-                                      QTY = tmhio.QTY ?? 0m,
+                                      QTY = tmhio.QTY,
                                       PRICE = tmhio.PRICE,
                                       SALES = tmhio.SALES ?? string.Empty,
                                       ORIGN = tmhio.ORIGN ?? string.Empty,
@@ -290,7 +279,7 @@ namespace WebApplication1.Service.Impl
                                       MODDATE = tmhio.MODDATE ?? string.Empty,
                                       MODTIME = tmhio.MODTIME ?? string.Empty,
                                       MODUSER = tmhio.MODUSER ?? string.Empty,
-                                      CNAME = mstmb.CNAME ?? string.Empty
+                                      CNAME = mstmbDict[tmhio.STOCK].CNAME
                                   }).ToList();
 
                     return result;
@@ -323,9 +312,8 @@ namespace WebApplication1.Service.Impl
             try
             {
                 var hcmioList = await _repository.GetByTwoKeyWithTimeForHCMIO(bhno, cseq, sdate, edate, stockSymbol);
-                var mstmbList = InMemoryCache.MSTMBData;
+                var mstmbDict = _inMemoryCache.MSTMBData;
                 var result = (from hcmio in hcmioList
-                              join mstmb in mstmbList on hcmio.STOCK equals mstmb.STOCK
                               select new ExtendedHCMIO
                               {
                                   TDATE = hcmio.TDATE ?? string.Empty,
@@ -369,7 +357,7 @@ namespace WebApplication1.Service.Impl
                                   MODDATE = hcmio.MODDATE ?? string.Empty,
                                   MODTIME = hcmio.MODTIME ?? string.Empty,
                                   MODUSER = hcmio.MODUSER ?? string.Empty,
-                                  CNAME = mstmb.CNAME ?? string.Empty
+                                  CNAME = mstmbDict[hcmio.STOCK].CNAME ?? string.Empty
                               }).ToList();
 
                 return result;

@@ -67,11 +67,9 @@ namespace WebApplication1.Service.Dtos
         public decimal? estimateTax { get; set; }
         public decimal? profit { get; set; }
         public string pl_ratio { get; set; }
-    }
-    public class UnOffset
-    {
-        public TCNUD TCNUD { get; set; }
-        public string CNAME { get; set; }
-        public decimal? CPRICE { get; set; }
+        public string wtype { get; set; }
+        public string ioflag { get; set; }
+        public string ioname { get; set; }
+
     }
 }
