@@ -2,7 +2,6 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Common;
-using WebApplication1.Util;
 using WebApplication1.Service.Dtos;
 using WebApplication1.Service.Api;
 using WebApplication1.Service.Impl;
@@ -31,8 +30,9 @@ builder.Services.AddSwaggerGen();
 // 在 Autofac 容器中註冊服務
 builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
 {
-
+    containerBuilder.RegisterType<InMemoryCache>().SingleInstance(); 
     containerBuilder.RegisterType<ErrorService>().As<IErrorService>().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<Util>().AsSelf().InstancePerLifetimeScope();
 
     containerBuilder.RegisterType<UnOffsetRepository>().As<IUnOffsetRepository>().InstancePerLifetimeScope();
     containerBuilder.RegisterType<UnOffsetAccsum>().AsSelf().InstancePerLifetimeScope();
@@ -49,17 +49,6 @@ builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-
-    InMemoryCache.HCNRHData = context.HCNRHTable.ToList();
-    InMemoryCache.HCNTDData = context.HCNTDTable.ToList();
-    InMemoryCache.TCNUDData = context.TCNUDTable.ToList();
-    InMemoryCache.MSTMBData = context.MSTMBTable.ToList();
-    InMemoryCache.HCMIOData = context.HCMIOTable.ToList();
-    InMemoryCache.TMHIOData = context.TMHIOTable.ToList();
-}
 
 if (app.Environment.IsDevelopment())
 {

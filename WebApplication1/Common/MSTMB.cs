@@ -7,7 +7,7 @@ namespace WebApplication1.Common
     {
         [Key]
         [MaxLength(6)]
-        public string? STOCK { get; set; }
+        public string STOCK { get; set; }
 
         [MaxLength(32)]
         public string? CNAME { get; set; }

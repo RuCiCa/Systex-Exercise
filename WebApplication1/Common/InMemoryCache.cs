@@ -3,23 +3,26 @@ using WebApplication1.Service.Dtos;
 
 namespace WebApplication1.Common
 {
-    public static class InMemoryCache
+    public class InMemoryCache
     {
-        public static List<HCNRH> HCNRHData { get; set; }
-        public static List<HCNTD> HCNTDData { get; set; }
-        public static List<TCNUD> TCNUDData { get; set; }
-        public static List<MSTMB> MSTMBData { get; set; }
-        public static List<HCMIO> HCMIOData { get; set; }
-        public static List<TMHIO> TMHIOData { get; set; }
+        public List<MSTMB> MSTMBList { get; set; }
+        public List<MSYS> MSYSList { get; set; }
+        public Dictionary<string, MSTMB> MSTMBData { get; set; }
 
-        static InMemoryCache()
+        public Dictionary<string, MSYS> MSYSData { get; set; }
+
+        public InMemoryCache(MyDbContext context)
         {
-            HCNRHData = new List<HCNRH>();
-            HCNTDData = new List<HCNTD>();
-            TCNUDData = new List<TCNUD>();
-            MSTMBData = new List<MSTMB>();
-            HCMIOData = new List<HCMIO>();
-            TMHIOData = new List<TMHIO>();
+            MSTMBList = context.MSTMBTable.Distinct().ToList();
+            MSYSList = context.MSYSTable.Distinct().ToList();
+            MSTMBData = MSTMBList
+                .GroupBy(x => x.STOCK)
+                .Select(g => g.First())
+                .ToDictionary(x => x.STOCK, x => x);
+            MSYSData = MSYSList
+                .GroupBy(x => x.VARNAME)
+                .Select(g => g.First())
+                .ToDictionary(x => x.VARNAME, x => x);
         }
     }
 }
