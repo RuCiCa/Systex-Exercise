@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApplication1.Common;
 using WebApplication1.Service.Dtos;
 
 namespace TestProject1
@@ -83,6 +84,110 @@ namespace TestProject1
                 pl_ratio = (((16500 - 16500 * 0.001425m - 16500 * 0.003m) - 15000) / 15000 * 100).ToString() + "%"
             }
         };
+        }
+        public static List<TMHIO> GetSampleTMHIO()
+        {
+            return new List<TMHIO>
+            {
+                new TMHIO
+                {
+                    TDATE = "20240903",
+                    BHNO = "592S",
+                    DSEQ = "i0015",
+                    JRNUM = "00019137",
+                    MTYPE = "T",
+                    CSEQ = "0105192",
+                    TTYPE = "0",
+                    ETYPE = "2",
+                    BSTYPE = "B",
+                    STOCK = "2603",
+                    QTY = 10m,
+                    PRICE = 1.5000m,
+                    SALES = "0025",
+                    ORIGN = "1",
+                    MTIME = "090009191",
+                    TRDATE = "20221017",
+                    TRTIME = "090010",
+                    MODDATE = "20221017",
+                    MODTIME = "090010",
+                    MODUSER = "REPLY"
+                },
+                new TMHIO
+                {
+                    TDATE = "20240903",
+                    BHNO = "592S",
+                    DSEQ = "i0015",
+                    JRNUM = "00021151",
+                    MTYPE = "T",
+                    CSEQ = "0105192",
+                    TTYPE = "0",
+                    ETYPE = "0",
+                    BSTYPE = "B",
+                    STOCK = "2603",
+                    QTY = 10m,
+                    PRICE = 17.5000m,
+                    SALES = "0025",
+                    ORIGN = "1",
+                    MTIME = "090010122",
+                    TRDATE = "20221017",
+                    TRTIME = "090010",
+                    MODDATE = "20221017",
+                    MODTIME = "090010",
+                    MODUSER = "REPLY"
+                }
+            };
+        }
+        public static List<TMHIO> GetRealTMHIO()
+        {
+            return new List<TMHIO>
+            {
+                new TMHIO
+                {
+                    TDATE = "20240903",
+                    BHNO = "592S",
+                    DSEQ = "i0015",
+                    JRNUM = "00019137",
+                    MTYPE = "T",
+                    CSEQ = "0105192",
+                    TTYPE = "0",
+                    ETYPE = "0",
+                    BSTYPE = "B",
+                    STOCK = "2603",
+                    QTY = 1000m,
+                    PRICE = 147.5000m,
+                    SALES = "0025",
+                    ORIGN = "1",
+                    MTIME = "090009191",
+                    TRDATE = "20221017",
+                    TRTIME = "090010",
+                    MODDATE = "20221017",
+                    MODTIME = "090010",
+                    MODUSER = "REPLY"
+                },
+                new TMHIO
+                {
+                    TDATE = "20240903",
+                    BHNO = "592S",
+                    DSEQ = "i0015",
+                    JRNUM = "00021151",
+                    MTYPE = "T",
+                    CSEQ = "0105192",
+                    TTYPE = "0",
+                    ETYPE = "0",
+                    BSTYPE = "B",
+                    STOCK = "2603",
+                    QTY = 2000m,
+                    PRICE = 147.5000m,
+                    SALES = "0025",
+                    ORIGN = "1",
+                    MTIME = "090010122",
+                    TRDATE = "20221017",
+                    TRTIME = "090010",
+                    MODDATE = "20221017",
+                    MODTIME = "090010",
+                    MODUSER = "REPLY"
+                }
+            };
         }
     }
 }
