@@ -14,13 +14,13 @@ namespace TestProject1
     public class ProfitServiceTests
     {
         private ProfitService _profitService;
-        private Calc _calc;
+        private Util _util;
 
         [SetUp]
         public void Setup()
         {
-            _calc = new Calc();
-            _profitService = new ProfitService(null, new ProfitAccsum(), null, _calc); // 初始化 ProfileService
+            _util = new Util();
+            _profitService = new ProfitService(new ProfitAccsum(), null, _util, null); // 初始化 ProfileService
         }
 
         [Test]
@@ -30,10 +30,7 @@ namespace TestProject1
             var hcnrhList = ProfitTestHelper.GetSampleExtendedHCNRH();
 
             // Act
-            var profitDetailSets = await _profitService.GetProfitDetailSets(hcnrhList.Cast<dynamic>().ToList());
-            Assert.AreEqual(1, profitDetailSets.Count);
-            Assert.AreEqual(3, profitDetailSets.FirstOrDefault().profitDetails.Count);
-            var profitSumList = await _profitService.GetProfitSumList("001", "A12345", profitDetailSets);
+            var profitSumList = _profitService.GetProfitSumList(hcnrhList.Cast<dynamic>().ToList(), "001", "A12345");
             var profitSum = profitSumList.FirstOrDefault();
             // Assert
             Assert.NotNull(profitSumList);
@@ -63,10 +60,7 @@ namespace TestProject1
             var hcntdList = ProfitTestHelper.GetSampleExtendedHCNTD();
 
             // Act
-            var profitDetailSets = await _profitService.GetProfitDetailSets(hcntdList.Cast<dynamic>().ToList());
-            Assert.AreEqual(3, profitDetailSets.Count);
-            Assert.AreEqual(1, profitDetailSets.FirstOrDefault().profitDetails.Count);
-            var profitSumList = await _profitService.GetProfitSumList("001", "A12345", profitDetailSets);
+            var profitSumList = _profitService.GetProfitSumList(hcntdList.Cast<dynamic>().ToList(), "001", "A12345");
             var profitSum = profitSumList.FirstOrDefault();
             // Assert
             Assert.NotNull(profitSumList);
@@ -97,11 +91,10 @@ namespace TestProject1
             var hcnrhList = ProfitTestHelper.GetSampleExtendedHCNRH();
 
             // Act
-            var HCNTDSets = await _profitService.GetProfitDetailSets(hcntdList.Cast<dynamic>().ToList());
-            var HCNRHSets = await _profitService.GetProfitDetailSets(hcnrhList.Cast<dynamic>().ToList());
-            var profitDetailSets = HCNTDSets.Concat(HCNRHSets).ToList();
-            var profitSumList = await _profitService.GetProfitSumList("001", "A12345", profitDetailSets);
-            var profitAccsum = await _profitService.GetProfittAccsum(profitSumList);
+            var profitSumListHCNRH = _profitService.GetProfitSumList(hcnrhList.Cast<dynamic>().ToList(), "001", "A12345");
+            var profitSumListHCNTD = _profitService.GetProfitSumList(hcntdList.Cast<dynamic>().ToList(), "001", "A12345");
+            var profitSumList = profitSumListHCNRH.Concat(profitSumListHCNTD).ToList();
+            var profitAccsum = _profitService.GetProfittAccsum(profitSumList);
 
             // Assert
             Assert.NotNull(profitSumList);
