@@ -15,11 +15,13 @@ namespace WebApplication1.Repositories.Impl
     public class ProfitRepository : IProfitRepository
     {
         private readonly MyDbContext _context;
+        private readonly Util _util;
         private readonly InMemoryCache _inMemoryCache;
 
-        public ProfitRepository(MyDbContext context, InMemoryCache inMemoryCache)
+        public ProfitRepository(MyDbContext context, Util util, InMemoryCache inMemoryCache)
         {
             _inMemoryCache = inMemoryCache;
+            _util = util;
             _context = context;
         }
 
@@ -120,6 +122,86 @@ namespace WebApplication1.Repositories.Impl
                             MODDATE = hcntd.MODDATE ?? string.Empty,
                             MODTIME = hcntd.MODTIME ?? string.Empty,
                             MODUSER = hcntd.MODUSER ?? string.Empty,
+                        };
+
+            return await Task.FromResult(query.ToList());
+        }
+        /// <summary>
+        /// 取出TCNUD跟MSTMB
+        /// </summary>
+        /// <param name="bhno">分公司</param>
+        /// <param name="cseq">帳號</param>
+        /// <param name="stockSymbol">股票代碼</param>
+        /// <returns>回傳UnOffset，裡面包含TCNUD跟CNAME還有CPRICE</returns>
+        public async Task<IEnumerable<TCNUD>> GetByTwoKeyWithTimeForTCNUD(string bhno, string cseq, string stockSymbol)
+        {
+            var query = from tcnud in _context.TCNUDTable
+                        where tcnud.BHNO == bhno &&
+                              tcnud.CSEQ == cseq &&
+                              (string.IsNullOrEmpty(stockSymbol) || tcnud.STOCK == stockSymbol)
+                        select new TCNUD
+                        {
+                            TDATE = tcnud.TDATE,
+                            BHNO = tcnud.BHNO,
+                            CSEQ = tcnud.CSEQ,
+                            STOCK = tcnud.STOCK,
+                            PRICE = tcnud.PRICE,
+                            QTY = tcnud.QTY,
+                            BQTY = tcnud.BQTY,
+                            FEE = tcnud.FEE,
+                            COST = tcnud.COST,
+                            DSEQ = tcnud.DSEQ,
+                            DNO = tcnud.DNO,
+                            ADJDATE = tcnud.ADJDATE,
+                            WTYPE = tcnud.WTYPE,
+                            TRDATE = tcnud.TRDATE,
+                            TRTIME = tcnud.TRTIME,
+                            MODATE = tcnud.MODATE,
+                            MODTIME = tcnud.MODTIME,
+                            MODUSER = tcnud.MODUSER,
+                            IOFLAG = tcnud.IOFLAG,
+                            AMT = 0m,
+                            ETYPE = ""
+                        };
+
+            return await Task.FromResult(query.ToList());
+        }
+        /// <summary>
+        /// 取出TCNUD跟MSTMB
+        /// </summary>
+        /// <param name="bhno">分公司</param>
+        /// <param name="cseq">帳號</param>
+        /// <param name="stockSymbol">股票代碼</param>
+        /// <returns>回傳UnOffset，裡面包含TCNUD跟CNAME還有CPRICE</returns>
+        public async Task<IEnumerable<TMHIO>> GetByTwoKeyWithTimeForTMHIO(string bhno, string cseq, string sdate, string edate, string stockSymbol)
+        {
+            var query = from tmhio in _context.TMHIOTable
+                        where tmhio.BHNO == bhno &&
+                              tmhio.CSEQ == cseq &&
+                              (string.IsNullOrEmpty(stockSymbol) || tmhio.STOCK == stockSymbol)
+                        select new TMHIO
+                        {
+                            TDATE = tmhio.TDATE ?? string.Empty,
+                            BHNO = tmhio.BHNO ?? string.Empty,
+                            DSEQ = tmhio.DSEQ ?? string.Empty,
+                            JRNUM = tmhio.JRNUM ?? string.Empty,
+                            MTYPE = tmhio.MTYPE ?? string.Empty,
+                            CSEQ = tmhio.CSEQ ?? string.Empty,
+                            TTYPE = tmhio.TTYPE ?? string.Empty,
+                            ETYPE = _util.TransEtpye(tmhio.ETYPE) ?? string.Empty,
+                            BSTYPE = tmhio.BSTYPE ?? string.Empty,
+                            STOCK = tmhio.STOCK ?? string.Empty,
+                            QTY = tmhio.QTY,
+                            PRICE = tmhio.PRICE,
+                            SALES = tmhio.SALES ?? string.Empty,
+                            ORIGN = tmhio.ORIGN ?? string.Empty,
+                            MTIME = tmhio.MTIME ?? string.Empty,
+                            TRDATE = tmhio.TRDATE ?? string.Empty,
+                            TRTIME = tmhio.TRTIME ?? string.Empty,
+                            MODDATE = tmhio.MODDATE ?? string.Empty,
+                            MODTIME = tmhio.MODTIME ?? string.Empty,
+                            MODUSER = tmhio.MODUSER ?? string.Empty,
+                            AMT = _util.CalcMamt(tmhio.PRICE, tmhio.QTY, 0)
                         };
 
             return await Task.FromResult(query.ToList());

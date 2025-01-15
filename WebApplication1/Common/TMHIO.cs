@@ -31,5 +31,10 @@ namespace WebApplication1.Common
     {
         [JsonIgnore]
         public string? CNAME { get; set; }
+        public decimal RESFEE { get; set; }
+        public decimal RESTAX { get; set; }
+        public decimal RESINCOME { get; set; }
+        public decimal RESQTY { get; set; }
+
     }
 }

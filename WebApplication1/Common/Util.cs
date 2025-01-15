@@ -146,6 +146,20 @@ namespace WebApplication1.Common
             };
             return list;
         }
+
+
+        /// <summary>
+        /// 用來計算沖銷的BFEE、SFEE以及TAX，式子為A*B/C
+        /// </summary>
+        /// <param name="A">A</param>
+        /// <param name="B">B</param>
+        /// <param name="C">C</param>
+        /// <returns>合併成功回傳合併好的list，合併失敗回傳null</returns>
+        public decimal CalcUnOffset(decimal A, decimal B, decimal C)
+        {
+            decimal value = Math.Round(A * (B / C));
+            return value;
+        }
     }
 
 

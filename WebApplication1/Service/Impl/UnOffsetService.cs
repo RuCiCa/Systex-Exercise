@@ -1,4 +1,4 @@
-using Azure.Core;
+ï»¿using Azure.Core;
 using System.Collections.Generic;
 using System.ComponentModel;
 using WebApplication1.Common;
@@ -30,13 +30,13 @@ namespace WebApplication1.Service.Impl
             {
                 if (tcnudList.Count() == 0)
                 {
-                    Logger.Log(1, "°Ñ¼Æ", $"¥¼§ä¨ìTCNUD");
+                    Logger.Log(1, "åƒæ•¸", $"æœªæ‰¾åˆ°TCNUD");
                     return new List<ExtendedTCNUD>();
                 }
-                Logger.Log(1, "°Ñ¼Æ", $"TCNUD¤@¦@¦³{tcnudList.Count()}µ§¸ê®Æ");
+                Logger.Log(1, "åƒæ•¸", $"TCNUDä¸€å…±æœ‰{tcnudList.Count()}ç­†è³‡æ–™");
                 var mstmbDict = _inMemoryCache.MSTMBData;
 
-                Logger.Log(0, "¶}©l", $"Àò¨úTCNUD");
+                Logger.Log(0, "é–‹å§‹", $"ç²å–TCNUD");
                 var result = (from tcnud in tcnudList
                               select new ExtendedTCNUD
                               {
@@ -63,14 +63,20 @@ namespace WebApplication1.Service.Impl
                                   AMT = 0,
                                   CNAME = mstmbDict[tcnud.STOCK].CNAME,
                                   CPRICE = mstmbDict[tcnud.STOCK].CPRICE,
-                                  ETYPE = ""
+                                  ETYPE = "",
+                                  RESCOST = tcnud.COST,
+                                  RESQTY = tcnud.QTY,
+                                  RESFEE = tcnud.FEE,
                               }).ToList();
-
+                result = result.OrderBy(t => t.TDATE)
+                    .ThenBy(t => t.WTYPE)
+                    .ThenBy(t => t.DNO)
+                    .ToList();
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.Log(4, "¿ù»~", $"Àò¨úTCNUD»PMSTMB¥¢±Ñ, ¿ù»~°T®§: {ex.Message}");
+                Logger.Log(4, "éŒ¯èª¤", $"ç²å–TCNUDèˆ‡MSTMBå¤±æ•—, éŒ¯èª¤è¨Šæ¯: {ex.Message}");
                 return null;
             }
         }
@@ -81,10 +87,10 @@ namespace WebApplication1.Service.Impl
             {
                 if (tmhioList.Count() == 0)
                 {
-                    Logger.Log(1, "°Ñ¼Æ", $"¥¼§ä¨ìTMHIO");
+                    Logger.Log(1, "åƒæ•¸", $"æœªæ‰¾åˆ°TMHIO");
                     return new List<ExtendedTCNUD>();
                 }
-                Logger.Log(1, "°Ñ¼Æ", $"TMHIO¤@¦@¦³{tmhioList.Count()}µ§¸ê®Æ");
+                Logger.Log(1, "åƒæ•¸", $"TMHIOä¸€å…±æœ‰{tmhioList.Count()}ç­†è³‡æ–™");
                 var mstmbDict = _inMemoryCache.MSTMBData;
 
                 var result = (from tmhio in tmhioList
@@ -113,12 +119,13 @@ namespace WebApplication1.Service.Impl
                                        CNAME = mstmbDict[tmhio.STOCK].CNAME,
                                        CPRICE = mstmbDict[tmhio.STOCK].CPRICE,
 
+
                                    }).ToList();
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.Log(4, "¿ù»~", $"Àò¨úTMHIO»PMSTMB¥¢±Ñ, ¿ù»~°T®§: {ex.Message}");
+                Logger.Log(4, "éŒ¯èª¤", $"ç²å–TMHIOèˆ‡MSTMBå¤±æ•—, éŒ¯èª¤è¨Šæ¯: {ex.Message}");
                 return null;
             }
         }
@@ -129,10 +136,10 @@ namespace WebApplication1.Service.Impl
             {
                 if (tcsioList.Count() == 0)
                 {
-                    Logger.Log(1, "°Ñ¼Æ", $"¥¼§ä¨ìTCSIO");
+                    Logger.Log(1, "åƒæ•¸", $"æœªæ‰¾åˆ°TCSIO");
                     return new List<ExtendedTCNUD>();
                 }
-                Logger.Log(1, "°Ñ¼Æ", $"TCSIO¤@¦@¦³{tcsioList.Count()}µ§¸ê®Æ");
+                Logger.Log(1, "åƒæ•¸", $"TCSIOä¸€å…±æœ‰{tcsioList.Count()}ç­†è³‡æ–™");
                 var mstmbDict = _inMemoryCache.MSTMBData;
                 var msysDict = _inMemoryCache.MSYSData;
 
@@ -144,8 +151,8 @@ namespace WebApplication1.Service.Impl
                                   CSEQ = tcsio.CSEQ,
                                   STOCK = tcsio.STOCK,
                                   PRICE = 0,
-                                  QTY = tcsio.QTY,
-                                  BQTY = tcsio.QTY,
+                                  //QTY = tcsio.QTY,
+                                  //BQTY = tcsio.QTY,
                                   FEE = 0,
                                   COST = 0,
                                   DSEQ = tcsio.DSEQ,
@@ -166,19 +173,19 @@ namespace WebApplication1.Service.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log(4, "¿ù»~", $"Àò¨úTMHIO»PMSTMB¥¢±Ñ, ¿ù»~°T®§: {ex.Message}");
+                Logger.Log(4, "éŒ¯èª¤", $"ç²å–TMHIOèˆ‡MSTMBå¤±æ•—, éŒ¯èª¤è¨Šæ¯: {ex.Message}");
                 return null;
             }
         }
 
         /// <summary>
-        /// Àò¨ú¥¼¹ê²{·l¯qªº­ÓªÑ©ú²Ó
+        /// ç²å–æœªå¯¦ç¾æç›Šçš„å€‹è‚¡æ˜ç´°
         /// </summary>
-        /// <param name="unOffset">¦s©ñTCNUD¥H¤ÎCNAME¸òCPRICE</param>
-        /// <returns>¦¨¥\·|¦^¶ÇunOffsetDetail¡A¥Î¨Ó«O¦s</returns>
+        /// <param name="unOffset">å­˜æ”¾TCNUDä»¥åŠCNAMEè·ŸCPRICE</param>
+        /// <returns>æˆåŠŸæœƒå›å‚³unOffsetDetailï¼Œç”¨ä¾†ä¿å­˜</returns>
         public UnOffsetDetail GetUnOffsetDetail(ExtendedTCNUD extendedTCNUD)
         {
-            Logger.Log(0, "¶}©l", $"¶}©l­pºâ{extendedTCNUD.CNAME}¤§¥¼¹ê²{·l¯q ¡V ­ÓªÑ©ú²Ó¡A©e°U®Ñ¸¹{extendedTCNUD.DSEQ}-¤À³æ¸¹½X{extendedTCNUD.DNO}");
+            Logger.Log(0, "é–‹å§‹", $"é–‹å§‹è¨ˆç®—{extendedTCNUD.CNAME}ä¹‹æœªå¯¦ç¾æç›Š â€“ å€‹è‚¡æ˜ç´°ï¼Œå§”è¨—æ›¸è™Ÿ{extendedTCNUD.DSEQ}-åˆ†å–®è™Ÿç¢¼{extendedTCNUD.DNO}");
             try
             {
                 string stock = extendedTCNUD.STOCK;
@@ -191,7 +198,7 @@ namespace WebApplication1.Service.Impl
                 decimal? estimateAmt = Math.Floor((lastprice * extendedTCNUD.BQTY) ?? 0m);
                 decimal estFee = 0.001425m;
                 decimal estTax = 0.003m;
-                Logger.Log(2, "ÅÜ¼Æ", $"¤âÄò¶O¬°¡G{estFee}, µ|²v¬°¡G{estTax}");
+                Logger.Log(2, "è®Šæ•¸", $"æ‰‹çºŒè²»ç‚ºï¼š{estFee}, ç¨…ç‡ç‚ºï¼š{estTax}");
                 decimal? estimateFee = Math.Floor((estimateAmt * estFee) ?? 0m);
                 if (estimateFee < 20m)
                 {
@@ -212,7 +219,7 @@ namespace WebApplication1.Service.Impl
                 }
                 else
                 {
-                    Logger.Log(3, "Äµ§i", "cost¬°0¡AµLªk­pºâpl_ratio");
+                    Logger.Log(3, "è­¦å‘Š", "costç‚º0ï¼Œç„¡æ³•è¨ˆç®—pl_ratio");
                     pl_ratio = "NAN%";
                 }
 
@@ -222,7 +229,7 @@ namespace WebApplication1.Service.Impl
                     stocknm = stocknm,
                     tdate = extendedTCNUD.TDATE,
                     ttype = "0",
-                    ttypename = "²{¶R",
+                    ttypename = "ç¾è²·",
                     bstype = "B",
                     dseq = extendedTCNUD.DSEQ,
                     dno = extendedTCNUD.DNO,
@@ -244,27 +251,26 @@ namespace WebApplication1.Service.Impl
                     wtype = wtype
 
                 };
-                Logger.Log(0, "¦¨¥\", $"{extendedTCNUD.CNAME}¤§¥¼¹ê²{·l¯q ¡V ­ÓªÑ©ú²Ó¡A©e°U®Ñ¸¹{extendedTCNUD.DSEQ}-¤À³æ¸¹½X{extendedTCNUD.DNO}­pºâ¦¨¥\");
+                Logger.Log(0, "æˆåŠŸ", $"{extendedTCNUD.CNAME}ä¹‹æœªå¯¦ç¾æç›Š â€“ å€‹è‚¡æ˜ç´°ï¼Œå§”è¨—æ›¸è™Ÿ{extendedTCNUD.DSEQ}-åˆ†å–®è™Ÿç¢¼{extendedTCNUD.DNO}è¨ˆç®—æˆåŠŸ");
                 return unOffsetDetail;
             }
-            //³z¹LerrorHandler¨Ó³B²zerrcode¸òerrmsg
+            //é€éerrorHandlerä¾†è™•ç†errcodeè·Ÿerrmsg
             catch (Exception ex)
             {
-                //errorHandler("500", $"­pºâ{unOffset.CNAME}¤§¥¼¹ê²{·l¯q ¡V ­ÓªÑ©ú²Ó¡A©e°U®Ñ¸¹{tcnud.DSEQ}-¤À³æ¸¹½X{tcnud.DNO}®É¥X²{¿ù»~");
-                Logger.Log(4, "¥¢±Ñ", $"¿ù»~°T®§: {ex}");
+                //errorHandler("500", $"è¨ˆç®—{unOffset.CNAME}ä¹‹æœªå¯¦ç¾æç›Š â€“ å€‹è‚¡æ˜ç´°ï¼Œå§”è¨—æ›¸è™Ÿ{tcnud.DSEQ}-åˆ†å–®è™Ÿç¢¼{tcnud.DNO}æ™‚å‡ºç¾éŒ¯èª¤");
+                Logger.Log(4, "å¤±æ•—", $"éŒ¯èª¤è¨Šæ¯: {ex}");
                 return null;
             }
         }
 
         /// <summary>
-        /// Àò¨ú­ÓªÑ¥¼¹ê²{·l¯q
+        /// ç²å–å€‹è‚¡æœªå¯¦ç¾æç›Š
         /// </summary>
-        /// <param name="bhno">¤À¤½¥q</param>
-        /// <param name="cseq">±b¸¹</param>
-        /// <returns>¦¨¥\·|¦^¶ÇunOffsetDetailList¡A¥Î¨Ó«O¦sunOffsetDetail</returns>
+        /// <param name="bhno">åˆ†å…¬å¸</param>
+        /// <param name="cseq">å¸³è™Ÿ</param>
+        /// <returns>æˆåŠŸæœƒå›å‚³unOffsetDetailListï¼Œç”¨ä¾†ä¿å­˜unOffsetDetail</returns>
         public List<UnOffsetDetail> GetUnOffsetDetailList(List<ExtendedTCNUD> list)
         {
-            //«Ø¥ß¤@­Ódict¡AµM«á¨Ï¥ÎStringArrayComparer¨Ó¹ï§@¬°keyªºstring[]ÀË¬d
             var unOffsetDetailList = new List<UnOffsetDetail>();
 
 
@@ -283,24 +289,23 @@ namespace WebApplication1.Service.Impl
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(4, "¥¢±Ñ", $"¿ù»~°T®§: {ex}");
-                    //errorHandler("500", $"­pºâ{cName}¤§­ÓªÑ¥¼¹ê²{·l¯q®É¥X²{¿ù»~");
+                    Logger.Log(4, "å¤±æ•—", $"éŒ¯èª¤è¨Šæ¯: {ex}");
+                    //errorHandler("500", $"è¨ˆç®—{cName}ä¹‹å€‹è‚¡æœªå¯¦ç¾æç›Šæ™‚å‡ºç¾éŒ¯èª¤");
                     return null;
                 }
             }
 
-            //¦^¶Çlist¦A©¹¤W°µ­ÓªÑ©ú²Óªºlist
+            //å›å‚³listå†å¾€ä¸Šåšå€‹è‚¡æ˜ç´°çš„list
             return unOffsetDetailList;
         }
 
         /// <summary>
-        /// ±Nlist¸Ì­±ªº©Ò¦³UnOffsetDetailªº­È¥[Á`¡AÀò¨ú³æ¤@ªÑ²¼ªºunOffsetSum(­ÓªÑ¥¼¹ê²{·l¯q)
+        /// å°‡listè£¡é¢çš„æ‰€æœ‰UnOffsetDetailçš„å€¼åŠ ç¸½ï¼Œç²å–å–®ä¸€è‚¡ç¥¨çš„unOffsetSum(å€‹è‚¡æœªå¯¦ç¾æç›Š)
         /// </summary>
-        /// <param name="list">¦s©ñ³æ¤@ªÑ²¼ªº©Ò¦³¥¼¹ê²{·l¯q©ú²Ó</param>
-        /// <returns>¦¨¥\·|¦^¶Ç³æ¤@ªÑ²¼ªºunOffsetSum¡A¥Î¨Ó«O¦s­ÓªÑ¥¼¹ê²{·l¯q</returns>
+        /// <param name="list">å­˜æ”¾å–®ä¸€è‚¡ç¥¨çš„æ‰€æœ‰æœªå¯¦ç¾æç›Šæ˜ç´°</param>
+        /// <returns>æˆåŠŸæœƒå›å‚³å–®ä¸€è‚¡ç¥¨çš„unOffsetSumï¼Œç”¨ä¾†ä¿å­˜å€‹è‚¡æœªå¯¦ç¾æç›Š</returns>
         public UnOffsetSum GetUnOffsetSum(List<UnOffsetDetail> list)
         {
-
             try
             {
                 string stock = list.FirstOrDefault()?.stock;
@@ -322,7 +327,7 @@ namespace WebApplication1.Service.Impl
                 decimal? amt = list.Sum(t => t.mamt);
                 string pl_ratio;
 
-                //UnOffsetDetail¤w¸g¦³°µ¹L¿ù»~log¬ö¿ı
+                //UnOffsetDetailå·²ç¶“æœ‰åšééŒ¯èª¤logç´€éŒ„
                 if (cost != 0m)
                 {
                     pl_ratio = ((profit / cost) * 100).ToString() + "%";
@@ -337,7 +342,7 @@ namespace WebApplication1.Service.Impl
                     stock = stock,
                     stocknm = stocknm,
                     ttype = "0",
-                    ttypename = "²{¶R",
+                    ttypename = "ç¾è²·",
                     bstype = "B",
                     bqty = bqty,
                     cost = cost,
@@ -359,25 +364,25 @@ namespace WebApplication1.Service.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log(4, "¥¢±Ñ", $"¿ù»~°T®§: {ex}");
-                //errorHandler("500", $"­pºâ{stocknm}­ÓªÑ¥¼¹ê²{·l¯q®É¥X²{¿ù»~");
+                Logger.Log(4, "å¤±æ•—", $"éŒ¯èª¤è¨Šæ¯: {ex}");
+                //errorHandler("500", $"è¨ˆç®—{stocknm}å€‹è‚¡æœªå¯¦ç¾æç›Šæ™‚å‡ºç¾éŒ¯èª¤");
                 return null;
             }
         }
 
         /// <summary>
-        /// ±Nlist¨Ì·ÓªÑ²¼¹ï¨C­Ólist¶i¦æ¤ÀÃş«á¤@¤@Àò¨úUnOffsetSum¨Ã¦s¤Jlist
+        /// å°‡listä¾ç…§è‚¡ç¥¨å°æ¯å€‹listé€²è¡Œåˆ†é¡å¾Œä¸€ä¸€ç²å–UnOffsetSumä¸¦å­˜å…¥list
         /// </summary>
-        /// <param name="list">©Ò¦³ªº­ÓªÑ©ú²Ó</param>
-        /// <returns>¦¨¥\·|¦^¶ÇunOffsetSumList¡A¥Î¨Ó«O¦s©Ò¦³ªº­ÓªÑ¥¼¹ê²{·l¯q</returns>
+        /// <param name="list">æ‰€æœ‰çš„å€‹è‚¡æ˜ç´°</param>
+        /// <returns>æˆåŠŸæœƒå›å‚³unOffsetSumListï¼Œç”¨ä¾†ä¿å­˜æ‰€æœ‰çš„å€‹è‚¡æœªå¯¦ç¾æç›Š</returns>
         public List<UnOffsetSum> GetUnOffsetSumList(List<UnOffsetDetail> list)
         {
             List<UnOffsetSum> unOffsetSums = new List<UnOffsetSum>();
             var groupedUnOffsets = list.GroupBy(u => new { u.stock, u.stocknm });
-            //®Ú¾Ú¤@ºØªÑ²¼¤@­Ó­ÓªÑ¥¼¹ê²{Åv¯q
+            //æ ¹æ“šä¸€ç¨®è‚¡ç¥¨ä¸€å€‹å€‹è‚¡æœªå¯¦ç¾æ¬Šç›Š
             foreach (var group in groupedUnOffsets)
             {
-                Logger.Log(0, "¶}©l", $"¶}©l­pºâ{group.Key.stocknm}¤§­ÓªÑ¥¼¹ê²{·l¯q");
+                Logger.Log(0, "é–‹å§‹", $"é–‹å§‹è¨ˆç®—{group.Key.stocknm}ä¹‹å€‹è‚¡æœªå¯¦ç¾æç›Š");
                 try
                 {
                     UnOffsetSum unOffsetSum = GetUnOffsetSum(group.ToList());
@@ -389,40 +394,40 @@ namespace WebApplication1.Service.Impl
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(4, "¥¢±Ñ", $"¿ù»~°T®§: {ex}");
-                    //errorHandler("500", $"­pºâ{group.Key.stocknm}¤§­ÓªÑ¥¼¹ê²{·l¯q®É¥X²{¿ù»~");
+                    Logger.Log(4, "å¤±æ•—", $"éŒ¯èª¤è¨Šæ¯: {ex}");
+                    //errorHandler("500", $"è¨ˆç®—{group.Key.stocknm}ä¹‹å€‹è‚¡æœªå¯¦ç¾æç›Šæ™‚å‡ºç¾éŒ¯èª¤");
                     return null;
                 }
-                Logger.Log(0, "¦¨¥\", $"{group.Key.stocknm}¤§­ÓªÑ¥¼¹ê²{·l¯q­pºâ¦¨¥\");
+                Logger.Log(0, "æˆåŠŸ", $"{group.Key.stocknm}ä¹‹å€‹è‚¡æœªå¯¦ç¾æç›Šè¨ˆç®—æˆåŠŸ");
             }
             return unOffsetSums;
         }
 
         /// <summary>
-        /// ±N©Ò¦³ªº­ÓªÑ¥¼¹ê²{·l¯q¥[Á`¨Ã¶Ç¥X
+        /// å°‡æ‰€æœ‰çš„å€‹è‚¡æœªå¯¦ç¾æç›ŠåŠ ç¸½ä¸¦å‚³å‡º
         /// </summary>
-        /// <param name="list">©Ò¦³ªº­ÓªÑ¥¼¹ê²{·l¯q</param>
-        /// <returns>¦¨¥\·|¦^¶Çunoffset_qtype_accsum¡A¥Î¨Ó«O¦s±b¸¹¶×Á`</returns>
+        /// <param name="list">æ‰€æœ‰çš„å€‹è‚¡æœªå¯¦ç¾æç›Š</param>
+        /// <returns>æˆåŠŸæœƒå›å‚³unoffset_qtype_accsumï¼Œç”¨ä¾†ä¿å­˜å¸³è™ŸåŒ¯ç¸½</returns>
         public UnOffsetAccsum GetUnOffsetAccsum(List<UnOffsetSum> list)
         {
-            Logger.Log(0, "¶}©l", $"¶}©lÀò¨ú°ê¤ºÃÒ¨é-¥¼¹ê²{·l¯q ±b¸¹·JÁ`");
+            Logger.Log(0, "é–‹å§‹", $"é–‹å§‹ç²å–åœ‹å…§è­‰åˆ¸-æœªå¯¦ç¾æç›Š å¸³è™Ÿå½™ç¸½");
             UnOffsetAccsum unoffset_qtype_accsum = new UnOffsetAccsum();
             try
             {
 
-                //·íGetUnOffsetSum©Î¬OGetUnOffsetDetail¥X²{°İÃD®É·|¦^¶Çnull¡A¦]¬°°T®§¤w¸g¼g¦n¡A©Ò¥Hª½±µ¦^¶Ç¥u¦s©ñ¦³¿ù»~°T®§ªº
+                //ç•¶GetUnOffsetSumæˆ–æ˜¯GetUnOffsetDetailå‡ºç¾å•é¡Œæ™‚æœƒå›å‚³nullï¼Œå› ç‚ºè¨Šæ¯å·²ç¶“å¯«å¥½ï¼Œæ‰€ä»¥ç›´æ¥å›å‚³åªå­˜æ”¾æœ‰éŒ¯èª¤è¨Šæ¯çš„
                 if (list == null)
                 {
                     return unoffset_qtype_accsum;
                 }
 
-                //³z¹Llistªº¥[Á`¥\¯à¥[Á`¨C¤@¶µ
+                //é€élistçš„åŠ ç¸½åŠŸèƒ½åŠ ç¸½æ¯ä¸€é …
                 var bqty = list.Sum(t => t.bqty);
                 var cost = list.Sum(t => t.cost);
                 var marketvalue = list.Sum(t => t.marketvalue);
                 var profit = list.Sum(t => t.profit);
 
-                //¦bUnOffsetDetail¤w¸g¦³¹ïpl_ratio°µ¿ù»~logªº¬ö¿ı¤F¡A©Ò¥H¥u¦b¸Ì­±°O¿ı¤@¦¸
+                //åœ¨UnOffsetDetailå·²ç¶“æœ‰å°pl_ratioåšéŒ¯èª¤logçš„ç´€éŒ„äº†ï¼Œæ‰€ä»¥åªåœ¨è£¡é¢è¨˜éŒ„ä¸€æ¬¡
                 string pl_ratio;
                 if (cost != 0m)
                 {
@@ -444,7 +449,7 @@ namespace WebApplication1.Service.Impl
                 decimal? estimateTax = Math.Floor((list.Sum(t => t.estimateTax)) ?? 0m);
 
                 var errcode = "0000";
-                var errmsg = "¦¨¥\";
+                var errmsg = "æˆåŠŸ";
 
                 unoffset_qtype_accsum = new UnOffsetAccsum
                 {
@@ -462,27 +467,27 @@ namespace WebApplication1.Service.Impl
                     estimateTax = estimateTax,
                     unoffset_qtype_sum = list
                 };
-                Logger.Log(0, "¦¨¥\", "°ê¤ºÃÒ¨é-¥¼¹ê²{·l¯q ±b¸¹·JÁ`Àò¨ú¦¨¥\");
+                Logger.Log(0, "æˆåŠŸ", "åœ‹å…§è­‰åˆ¸-æœªå¯¦ç¾æç›Š å¸³è™Ÿå½™ç¸½ç²å–æˆåŠŸ");
                 return unoffset_qtype_accsum;
             }
             catch (Exception ex)
             {
                 unoffset_qtype_accsum.errcode = "500";
-                unoffset_qtype_accsum.errmsg = "°ê¤ºÃÒ¨é-¥¼¹ê²{·l¯q ±b¸¹·JÁ`Àò¨ú¥¢±Ñ";
+                unoffset_qtype_accsum.errmsg = "åœ‹å…§è­‰åˆ¸-æœªå¯¦ç¾æç›Š å¸³è™Ÿå½™ç¸½ç²å–å¤±æ•—";
                 unoffset_qtype_accsum.unoffset_qtype_sum = [];
 
-                Logger.Log(4, "¥¢±Ñ", $"°ê¤ºÃÒ¨é-¥¼¹ê²{·l¯q ±b¸¹·JÁ`Àò¨ú¥¢±Ñ¡A¿ù»~°T®§¡G{ex.Message}");
+                Logger.Log(4, "å¤±æ•—", $"åœ‹å…§è­‰åˆ¸-æœªå¯¦ç¾æç›Š å¸³è™Ÿå½™ç¸½ç²å–å¤±æ•—ï¼ŒéŒ¯èª¤è¨Šæ¯ï¼š{ex.Message}");
 
                 return unoffset_qtype_accsum;
             }
         }
 
         /// <summary>
-        /// ¥Í¦¨¥¼¹ê²{·l¯qªº¿ù»~°T®§
+        /// ç”Ÿæˆæœªå¯¦ç¾æç›Šçš„éŒ¯èª¤è¨Šæ¯
         /// </summary>
-        /// <param name="errcode">¿ù»~½X</param>
-        /// <param name="errmsg">¿ù»~°T®§</param>
-        /// <returns>¦¨¥\·|¦^¶Çunoffset_qtype_accsum¡A¥Î¨Ó«O¦s±b¸¹¶×Á`</returns>
+        /// <param name="errcode">éŒ¯èª¤ç¢¼</param>
+        /// <param name="errmsg">éŒ¯èª¤è¨Šæ¯</param>
+        /// <returns>æˆåŠŸæœƒå›å‚³unoffset_qtype_accsumï¼Œç”¨ä¾†ä¿å­˜å¸³è™ŸåŒ¯ç¸½</returns>
         public UnOffsetAccsum GetFailedUnOffsetAccsum(string errcode, string errmsg)
         {
             UnOffsetAccsum unoffset_qtype_accsum = new UnOffsetAccsum();
@@ -494,33 +499,39 @@ namespace WebApplication1.Service.Impl
             return unoffset_qtype_accsum;
         }
 
+
+
+
+        //æ²–éŠ·åŸå‰‡ç‚ºï¼»å…ˆé€²å…ˆå‡ºï¼½ï¼ŒTCNUDæ’åºæ¢ä»¶ï¼šTDATEã€WTYPEã€DNO
         public async Task<UnOffsetAccsum> GetUnOffsetService(string bhno, string cseq, string stockSymbol)
         {
             try
             {
-                //¸ê®Æ®w¤º´M§ä©Ò¦³ªº¥æ©ö¬ö¿ı¡A¦pªG¨S§ä¨ì¥ô¦ó¬ö¿ı´N·|¦^¶Ç404 Not Found
-                Logger.Log(0, "¶}©l", $"¶}©l·j´M{bhno}±b¸¹{cseq}ªº¥æ©ö¬ö¿ı");
-                List<TMHIO> tmhioList = (await _repository.GetByTwoKeyTMHIO(bhno, cseq, stockSymbol)).ToList();
+                //è³‡æ–™åº«å…§å°‹æ‰¾æ‰€æœ‰çš„äº¤æ˜“ç´€éŒ„ï¼Œå¦‚æœæ²’æ‰¾åˆ°ä»»ä½•ç´€éŒ„å°±æœƒå›å‚³404 Not Found
+                Logger.Log(0, "é–‹å§‹", $"é–‹å§‹æœå°‹{bhno}å¸³è™Ÿ{cseq}çš„äº¤æ˜“ç´€éŒ„");
                 List<TCNUD> tcnudList = (await _repository.GetByTwoKey(bhno, cseq, stockSymbol)).ToList();
+                List<TMHIO> tmhioList = (await _repository.GetByTwoKeyTMHIO(bhno, cseq, stockSymbol)).ToList();
+                
                 List<TCSIO> tcsioList = (await _repository.GetByTwoKeyTCSIO(bhno, cseq, stockSymbol)).ToList();
 
-                Logger.Log(1, "°Ñ¼Æ", $"Àò¨úTCNUD»PMSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
-                var TMHIOList = GetTMHIOList(tmhioList);
-                Logger.Log(1, "°Ñ¼Æ", $"Àò¨ú¼Æ¶q¬°{TMHIOList.Count()}");
-
-                Logger.Log(1, "°Ñ¼Æ", $"Àò¨úTCNUD»PMSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+                Logger.Log(1, "åƒæ•¸", $"ç²å–TCNUDèˆ‡MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
                 var TCNUDList = GetTCNUDList(tcnudList);
-                Logger.Log(1, "°Ñ¼Æ", $"Àò¨ú¼Æ¶q¬°{TCNUDList.Count()}");
 
-                Logger.Log(1, "°Ñ¼Æ", $"Àò¨úTCNUD»PMSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+                Logger.Log(1, "åƒæ•¸", $"ç²å–æ•¸é‡ç‚º{TCNUDList.Count()}");
+
+                Logger.Log(1, "åƒæ•¸", $"ç²å–TMHIOèˆ‡MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
+                var TMHIOList = GetTMHIOList(tmhioList);
+                Logger.Log(1, "åƒæ•¸", $"ç²å–æ•¸é‡ç‚º{TMHIOList.Count()}");
+
+                Logger.Log(1, "åƒæ•¸", $"ç²å–TCSIOèˆ‡MSTMB - bhno: {bhno}, cseq: {cseq}, stockSymbol: {stockSymbol}");
                 var TCSIOList = GetTCSIOList(tcsioList);
-                Logger.Log(1, "°Ñ¼Æ", $"Àò¨ú¼Æ¶q¬°{TCSIOList.Count()}");
+                Logger.Log(1, "åƒæ•¸", $"ç²å–æ•¸é‡ç‚º{TCSIOList.Count()}");
 
 
                 var list = new List<ExtendedTCNUD>();
                 if (TMHIOList.Count() == 0 && TCNUDList.Count() == 0 && TCSIOList.Count() == 0)
                 {
-                    return GetFailedUnOffsetAccsum("404", "¥¼¬d¸ß¨ì¥ô¦ó¸ê®Æ");
+                    return GetFailedUnOffsetAccsum("404", "æœªæŸ¥è©¢åˆ°ä»»ä½•è³‡æ–™");
                 }
                 list = _util.ConcatLists(TMHIOList, TCNUDList);
                 list = _util.ConcatLists(list, TCSIOList);
@@ -529,24 +540,24 @@ namespace WebApplication1.Service.Impl
                 var UnOffsetDetailList = GetUnOffsetDetailList(list);
                 if (UnOffsetDetailList == null)
                 {
-                    return GetFailedUnOffsetAccsum("404", "¥¼¹ê²{·l¯q ¡V ­ÓªÑ©ú²ÓÀò¨ú¥¢±Ñ");
+                    return GetFailedUnOffsetAccsum("404", "æœªå¯¦ç¾æç›Š â€“ å€‹è‚¡æ˜ç´°ç²å–å¤±æ•—");
                 }
                 if (UnOffsetDetailList.Count == 0)
                 {
-                    return GetFailedUnOffsetAccsum("404", $"¥¼§ä¨ì{bhno}±b¸¹{cseq}ªº¥æ©ö¬ö¿ı");
+                    return GetFailedUnOffsetAccsum("404", $"æœªæ‰¾åˆ°{bhno}å¸³è™Ÿ{cseq}çš„äº¤æ˜“ç´€éŒ„");
                 }
                 var UnOffsetSumList = GetUnOffsetSumList(UnOffsetDetailList);
                 if (UnOffsetSumList == null)
                 {
-                    return GetFailedUnOffsetAccsum("404", "­ÓªÑ¥¼¹ê²{·l¯qÀò¨ú¥¢±Ñ");
+                    return GetFailedUnOffsetAccsum("404", "å€‹è‚¡æœªå¯¦ç¾æç›Šç²å–å¤±æ•—");
                 }
                 var response = GetUnOffsetAccsum(UnOffsetSumList);
                 return response;
             }
-            //¹Lµ{¤¤¥¼¨¾§bªº³¡¤À³£·|§ì¨ì³oÃä
+            //éç¨‹ä¸­æœªé˜²å‘†çš„éƒ¨åˆ†éƒ½æœƒæŠ“åˆ°é€™é‚Š
             catch (Exception ex)
             {
-                Logger.Log(4, "¿ù»~", $"·j´M{bhno}±b¸¹{cseq}ªº¥æ©ö¬ö¿ı®É¥X²{¤F¿ù»~¡G{ex}");
+                Logger.Log(4, "éŒ¯èª¤", $"æœå°‹{bhno}å¸³è™Ÿ{cseq}çš„äº¤æ˜“ç´€éŒ„æ™‚å‡ºç¾äº†éŒ¯èª¤ï¼š{ex}");
                 var response = GetFailedUnOffsetAccsum("500", "Internal Server Error");
                 return response;
             }

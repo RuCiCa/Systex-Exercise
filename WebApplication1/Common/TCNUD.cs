@@ -20,19 +20,19 @@ namespace WebApplication1.Common
         public string STOCK { get; set; }
 
         [Column(TypeName = "decimal(10, 4)")]
-        public decimal? PRICE { get; set; }
+        public decimal PRICE { get; set; }
 
         [Column(TypeName = "decimal(12, 0)")]
-        public decimal? QTY { get; set; }
+        public decimal QTY { get; set; }
 
         [Column(TypeName = "decimal(12, 0)")]
-        public decimal? BQTY { get; set; }
+        public decimal BQTY { get; set; }
 
         [Column(TypeName = "decimal(10, 2)")]
-        public decimal? FEE { get; set; }
+        public decimal FEE { get; set; }
 
         [Column(TypeName = "decimal(16, 2)")]
-        public decimal? COST { get; set; }
+        public decimal COST { get; set; }
 
         [MaxLength(5)]
         public string DSEQ { get; set; }
@@ -76,6 +76,8 @@ namespace WebApplication1.Common
         [JsonIgnore]
         public decimal? CPRICE { get; set; }
         public string? IOFLAGNAME { get; set; }
-
+        public decimal RESFEE { get; set; }
+        public decimal RESCOST { get; set; }
+        public decimal RESQTY { get; set; }
     }
 }

@@ -105,6 +105,7 @@ namespace WebApplication1.Repositories.Impl
 
             return await Task.FromResult(query.ToList());
         }
+
         /// <summary>
         /// ¨ú¥XTCNUD¸òMSTMB
         /// </summary>

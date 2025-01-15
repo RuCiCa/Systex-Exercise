@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Hosting;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using WebApplication1.Common;
@@ -99,7 +100,8 @@ namespace WebApplication1.Service.Impl
                 string tdate = table.TDATE;
                 string dseq = table.SDSEQ;
                 string dno = table.SDNO;
-                Logger.Log(1, "參數", $"已實現損益 - 個股明細資料 (賣出) - 資料庫： {tableType}, stock： {stock}, tdate： {tdate}, dseq： {dseq}, dno： {dno}");
+                decimal sqty = table.SQTY;
+                Logger.Log(1, "參數", $"已實現損益 - 個股明細資料 (賣出) - 資料庫： {tableType}, stock： {stock}, tdate： {tdate}, dseq： {dseq}, dno： {dno}, sqty: {sqty}");
 
                 decimal cost = table.COST ?? 0m;
                 decimal profitVal = table.PROFIT ?? 0m;
@@ -170,7 +172,7 @@ namespace WebApplication1.Service.Impl
 
                 foreach (var table in group)
                 {
-                    // 處理 ProfitDetail 和 ProfitDetailOut
+                    // 處理 ProfitDetail 和 ProfitDetailOut    
                     ProfitDetail profitDetail = GetProfitDetail(table);
                     ProfitDetailOut profitDetailOut = GetProfitDetailOut(table);
                     // 將每個群組的 profitDetail 加入到 list
@@ -200,8 +202,9 @@ namespace WebApplication1.Service.Impl
                 // 假設所有的 ProfitDetailOut 都具有相同的 TDATE、SDSEQ 和 SDNO
                 var firstItem = list.FirstOrDefault();
                 if (firstItem == null) return null;
-
-                Logger.Log(1, "參數", $"加總已實現損益 - 個股明細資料 (賣出) - 處理日期: {firstItem.tdate}, 委託書號: {firstItem.dseq}, 分單號: {firstItem.dno}");
+                // 記錄所有的 mqty 值
+                var mqtyValues = string.Join(", ", list.Select(t => t.mqty));
+                Logger.Log(1, "參數", $"加總已實現損益 - 個股明細資料 (賣出) - 處理日期: {firstItem.tdate}, 委託書號: {firstItem.dseq}, 分單號: {firstItem.dno}, mqty 值: {mqtyValues}");
 
                 return new ProfitDetailOut
                 {
@@ -210,7 +213,7 @@ namespace WebApplication1.Service.Impl
                     tdate = firstItem.tdate,
                     dseq = firstItem.dseq,
                     dno = firstItem.dno,
-                    mqty = list.Sum(t => t.mqty),
+                    mqty = firstItem.mqty,
                     cqty = list.Sum(t => t.cqty),
                     mprice = firstItem.mprice,
                     mamt = list.Sum(t => decimal.Parse(t.mamt)).ToString(),
@@ -297,6 +300,131 @@ namespace WebApplication1.Service.Impl
 
         }
 
+        public List<ExtendedTMHIO> GetTMHIOList(List<TMHIO> tmhioList)
+        {
+            try
+            {
+                if (tmhioList.Count() == 0)
+                {
+                    Logger.Log(1, "參數", $"未找到TMHIO");
+                    return new List<ExtendedTMHIO>();
+                }
+                Logger.Log(1, "參數", $"TMHIO一共有{tmhioList.Count()}筆資料");
+                var mstmbDict = _inMemoryCache.MSTMBData;
+
+                var result = (from tmhio in tmhioList
+                              select new ExtendedTMHIO
+                              {
+                                  TDATE = tmhio.TDATE ?? string.Empty,
+                                  BHNO = tmhio.BHNO ?? string.Empty,
+                                  DSEQ = tmhio.DSEQ ?? string.Empty,
+                                  JRNUM = tmhio.JRNUM ?? string.Empty,
+                                  MTYPE = tmhio.MTYPE ?? string.Empty,
+                                  CSEQ = tmhio.CSEQ ?? string.Empty,
+                                  TTYPE = tmhio.TTYPE ?? string.Empty,
+                                  ETYPE = tmhio.ETYPE ?? string.Empty,
+                                  BSTYPE = tmhio.BSTYPE ?? string.Empty,
+                                  STOCK = tmhio.STOCK ?? string.Empty,
+                                  QTY = tmhio.QTY,
+                                  PRICE = tmhio.PRICE,
+                                  SALES = tmhio.SALES ?? string.Empty,
+                                  ORIGN = tmhio.ORIGN ?? string.Empty,
+                                  MTIME = tmhio.MTIME ?? string.Empty,
+                                  TRDATE = tmhio.TRDATE ?? string.Empty,
+                                  TRTIME = tmhio.TRTIME ?? string.Empty,
+                                  MODDATE = tmhio.MODDATE ?? string.Empty,
+                                  MODTIME = tmhio.MODTIME ?? string.Empty,
+                                  MODUSER = tmhio.MODUSER ?? string.Empty,
+                                  CNAME = mstmbDict[tmhio.STOCK].CNAME,
+
+                                  AMT = _util.CalcMamt(tmhio.PRICE, (decimal)tmhio.QTY),
+                                  //RES>B
+                                  RESINCOME = _util.CalcMamt(tmhio.PRICE, (decimal)tmhio.QTY) + _util.CalcFee(tmhio.PRICE, (decimal)tmhio.QTY, etype: _util.TransEtpye(tmhio.ETYPE)),
+                                  RESQTY = tmhio.QTY,
+                                  RESTAX = _util.CalcTax(tmhio.PRICE, (decimal)tmhio.QTY),
+                                  RESFEE = _util.CalcFee(tmhio.PRICE, (decimal)tmhio.QTY),
+
+
+                              }).ToList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取TMHIO與MSTMB失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
+        }
+
+
+        /// <summary>
+        /// 獲取特定分公司特定帳號在時間範圍內的歷史現股沖銷
+        /// </summary>
+        /// <param name="bhno">分公司</param>
+        /// <param name="cseq">帳號</param>
+        /// <param name="sdate">開始日</param>
+        /// <param name="edate">結束日</param>
+        /// <param name="stockSymbol">股票代號</param>
+        /// <returns>回傳HCNRH加上CNAME組成的ExtendedHCNrh</returns>
+        public List<ExtendedTCNUD> GetTCNUDList(List<TCNUD> tcnudList)
+        {
+            try
+            {
+                if (tcnudList.Count() == 0)
+                {
+                    Logger.Log(1, "參數", $"未找到TCNUD");
+                    return new List<ExtendedTCNUD>();
+                }
+                Logger.Log(1, "參數", $"TCNUD一共有{tcnudList.Count()}筆資料");
+                var mstmbDict = _inMemoryCache.MSTMBData;
+
+                Logger.Log(0, "開始", $"獲取TCNUD");
+                var result = (from tcnud in tcnudList
+                              select new ExtendedTCNUD
+                              {
+                                  TDATE = tcnud.TDATE,
+                                  BHNO = tcnud.BHNO,
+                                  CSEQ = tcnud.CSEQ,
+                                  STOCK = tcnud.STOCK,
+                                  PRICE = tcnud.PRICE,
+                                  QTY = tcnud.QTY,
+                                  BQTY = tcnud.BQTY,
+                                  FEE = tcnud.FEE,
+                                  COST = tcnud.COST,
+                                  DSEQ = tcnud.DSEQ,
+                                  DNO = tcnud.DNO,
+                                  ADJDATE = tcnud.ADJDATE,
+                                  WTYPE = tcnud.WTYPE,
+                                  TRDATE = tcnud.TRDATE,
+                                  TRTIME = tcnud.TRTIME,
+                                  MODATE = tcnud.MODATE,
+                                  MODTIME = tcnud.MODTIME,
+                                  MODUSER = tcnud.MODUSER,
+                                  IOFLAG = tcnud.IOFLAG,
+
+                                  AMT = 0,
+                                  CNAME = mstmbDict[tcnud.STOCK].CNAME,
+                                  CPRICE = mstmbDict[tcnud.STOCK].CPRICE,
+                                  ETYPE = "",
+
+                                  //剩餘用B
+                                  RESCOST = tcnud.COST,
+                                  RESQTY = tcnud.QTY,
+                                  RESFEE = tcnud.FEE,
+                              }).ToList();
+                result = result.OrderBy(t => t.TDATE)
+                    .ThenBy(t => t.WTYPE)
+                    .ThenBy(t => t.DNO)
+                    .ToList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(4, "錯誤", $"獲取TCNUD與MSTMB失敗, 錯誤訊息: {ex.Message}");
+                return null;
+            }
+        }
+
+
         /// <summary>
         /// 獲取特定分公司特定帳號在時間範圍內的歷史現股當沖
         /// </summary>
@@ -368,6 +496,42 @@ namespace WebApplication1.Service.Impl
             try
             {
                 var hcnrhList = await _repository.GetByTwoKeyWithTimeForHCNRH(bhno, cseq, sdate, edate, stockSymbol);
+                var tcnudList = await _repository.GetByTwoKeyWithTimeForTCNUD(bhno, cseq, stockSymbol);
+                var tmhioList = await _repository.GetByTwoKeyWithTimeForTMHIO(bhno, cseq, sdate, edate, stockSymbol);
+
+                Logger.Log(1, "參數", $"HCNRH有{hcnrhList.Count()}筆、TCNUD有{tcnudList.Count()}筆、TMHIO有{tmhioList.Count()}筆");
+                List<ExtendedTMHIO> tmhios = GetTMHIOList(tmhioList.ToList());
+                var tmhioStocks = tmhios.Select(t => t.STOCK).Distinct();
+                Logger.Log(1, "TMHIO STOCKS", string.Join(", ", tmhioStocks));
+
+                List<ExtendedTCNUD> tcnuds = GetTCNUDList(tcnudList.ToList());
+
+                // 列出 tcnuds 的 STOCK
+                var tcnudStocks = tcnuds.Select(t => t.STOCK).Distinct();
+                Logger.Log(1, "TCNUD STOCKS", string.Join(", ", tcnudStocks));
+
+                List<HCNRH> hcnrhList2 = new List<HCNRH>();
+                // 將 tcnuds 按照 STOCK 分組
+                var groupedTCNUD = tcnuds.GroupBy(t => t.STOCK);
+
+                // 逐一處理每個分組
+                foreach (var group in groupedTCNUD)
+                {
+                    // 獲取分組內的資料
+                    List<ExtendedTCNUD> groupedTcnuds = group.ToList();
+
+                    // 可以根據需要篩選 tmhioList（如有需要，也可以加上條件）
+                    List<ExtendedTMHIO> relatedTmhios = tmhios.Where(t => t.STOCK == group.Key).ToList();
+
+                    // 調用 WriteOff 方法
+                    var newHCNRHList = WriteOff(groupedTcnuds, relatedTmhios);
+
+                    // 合併結果
+                    hcnrhList2 = _util.ConcatLists(hcnrhList2, newHCNRHList);
+                }
+
+                hcnrhList = _util.ConcatLists(hcnrhList.ToList(), hcnrhList2);
+
                 var mstmbDict = _inMemoryCache.MSTMBData;
                 var result = (from hcnrh in hcnrhList
                               select new ExtendedHCNRH
@@ -455,6 +619,98 @@ namespace WebApplication1.Service.Impl
             }
         }
 
+        public List<HCNRH> WriteOff(List<ExtendedTCNUD> tcnuds, List<ExtendedTMHIO> tmhios)
+        {
+            // 先按 FIFO 原則排序 tcnuds跟tmhios
+            tcnuds = tcnuds.OrderBy(x => x.TDATE).ThenBy(x => x.WTYPE).ThenBy(x => x.DNO).ToList();
+            tmhios = tmhios.OrderBy(x => x.TDATE).ThenBy(x => x.JRNUM).ToList();
+            List<HCNRH> hcnrhs = new List<HCNRH>();
+
+            foreach (var tmhio in tmhios)
+            {
+                decimal remainingQty = tmhio.RESQTY;
+                //額外宣告一個var，來作為判斷的依據
+                foreach (var tcnud in tcnuds.Where(t => t.STOCK == tmhio.STOCK && t.RESQTY > 0))
+                {
+                    if (tmhio.RESQTY <= 0)
+                    {
+                        if (hcnrhs.Count > 0)
+                        {
+                            var lastRecord = hcnrhs.Last();
+
+                            // 更新各欄位
+                            lastRecord.BFEE += tcnuds.Sum(t => t.RESFEE);
+                            lastRecord.SFEE += tmhios.Sum(t => t.RESFEE);
+                            lastRecord.TAX += tmhios.Sum(t => t.RESTAX);
+                            lastRecord.INCOME += tmhios.Sum(t => t.RESINCOME);
+                            lastRecord.COST += tcnuds.Sum(t => t.RESCOST);
+
+                            // 重新計算 PROFIT
+                            lastRecord.PROFIT = lastRecord.INCOME - lastRecord.COST;
+                        }
+                        break;
+                    }
+                       
+
+                    //改成cqty
+                    decimal qtyToWriteOff = Decimal.Min(tcnud.RESQTY, tmhio.RESQTY);
+
+                    decimal bFee = _util.CalcUnOffset(tcnud.FEE, qtyToWriteOff, tcnud.QTY);
+                    decimal cost = Math.Floor(tcnud.PRICE * qtyToWriteOff) + bFee;
+
+                    //用原始的fee跟tax
+                    decimal sFee = _util.CalcUnOffset(tmhio.RESFEE, qtyToWriteOff, tmhio.QTY);
+                    decimal tax = _util.CalcUnOffset(tmhio.RESTAX, qtyToWriteOff, tmhio.QTY);
+                    decimal income = Math.Floor(tmhio.PRICE * qtyToWriteOff) - sFee - tax;
+
+                    Logger.Log(1, "參數", $"cost:{cost}、income:{income}、sFee:{sFee}、bFee:{bFee}、tax:{tax}、qtyToWriteOff:{qtyToWriteOff}");
+
+                    HCNRH hcnrh = new HCNRH
+                    {
+                        BHNO = tmhio.BHNO,
+                        TDATE = tmhio.TDATE,
+                        RDATE = tcnud.TDATE,
+                        CSEQ = tcnud.CSEQ,
+                        BDSEQ = tcnud.DSEQ,
+                        BDNO = tcnud.DNO,
+                        SDSEQ = tmhio.DSEQ,
+                        SDNO = tmhio.JRNUM,
+                        STOCK = tmhio.STOCK,
+                        CQTY = qtyToWriteOff,
+                        BPRICE = tcnud.COST / tcnud.BQTY,
+                        BFEE = bFee,
+                        SPRICE = tmhio.PRICE,
+                        SFEE = sFee,
+                        TAX = tax,
+                        INCOME = income,
+                        COST = cost,
+                        PROFIT = income - cost,
+                        ADJDATE = "",
+                        WTYPE = "0",
+                        BQTY = tcnud.BQTY,
+                        SQTY = tmhio.QTY,
+                    };
+
+                    // 更新 tcnud 剩餘的數據
+                    tcnud.RESQTY -= qtyToWriteOff;
+                    tcnud.RESFEE -= bFee;
+                    tcnud.RESCOST -= cost;
+                    tmhio.RESQTY -= qtyToWriteOff;
+                    tmhio.RESFEE -= sFee;
+                    tmhio.RESTAX -= tax;
+                    tmhio.RESINCOME -= income;
+                    remainingQty -= qtyToWriteOff;
+
+                    hcnrhs.Add(hcnrh);
+                    
+                    //少寫最後加總
+                }
+            }
+
+            return hcnrhs;
+        }
+
+
         /// <summary>
         /// 生成已實現損益的錯誤訊息
         /// </summary>
@@ -485,33 +741,16 @@ namespace WebApplication1.Service.Impl
                 List<ProfitDetailOut> profitDetailOuts = new List<ProfitDetailOut>();
                 List<ProfitDetail> profitDetails = new List<ProfitDetail>();
                 List<ProfitSum> profitSumList = new List<ProfitSum>();
-
-                switch ((HCNTDList.Count() > 0, HCNRHList.Count() > 0))
+                
+                if (HCNTDList.Count == 0 && HCNRHList.Count == 0)
                 {
-                    case (true, true):
-                        {
-                            List<ProfitSum> HCNTDSum = GetProfitSumList(HCNTDList.Cast<dynamic>().ToList(), bhno, cseq);
-                            List<ProfitSum> HCNRHSum = GetProfitSumList(HCNRHList.Cast<dynamic>().ToList(), bhno, cseq);
-                            profitSumList = HCNRHSum.Concat(HCNTDSum).ToList();
-
-                            break;
-                        }
-                    case (true, false):
-                        {
-                            profitSumList = GetProfitSumList(HCNTDList.Cast<dynamic>().ToList(), bhno, cseq);
-                            break;
-                        }
-                    case (false, true):
-                        {
-                            profitSumList = GetProfitSumList(HCNRHList.Cast<dynamic>().ToList(), bhno, cseq);
-                            break;
-                        }
-                    case (false, false):
-                        {
-                            Logger.Log(3, "錯誤", $"未找到分公司{bhno}帳號{cseq}在{sdate} 到 {Edate}這段期間的交易紀錄");
-                            return GetProfittAccsumFailed("404", $"未找到分公司{bhno}帳號{cseq}在{sdate} 到 {Edate}這段期間的交易");
-                        }
+                    Logger.Log(3, "錯誤", $"未找到分公司{bhno}帳號{cseq}在{sdate} 到 {Edate}這段期間的交易紀錄");
+                    return GetProfittAccsumFailed("404", $"未找到分公司{bhno}帳號{cseq}在{sdate} 到 {Edate}這段期間的交易");
                 }
+
+                profitSumList = _util.ConcatLists(GetProfitSumList(HCNTDList.Cast<dynamic>().ToList(), bhno, cseq), GetProfitSumList(HCNRHList.Cast<dynamic>().ToList(), bhno, cseq));
+
+
 
                 var response = GetProfittAccsum(profitSumList);
                 if (response is null)
